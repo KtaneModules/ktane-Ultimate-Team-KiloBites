@@ -7,7 +7,7 @@ using KModkit;
 using static UnityEngine.Random;
 using static UnityEngine.Debug;
 
-public class TemplateScript : MonoBehaviour {
+public class UltimateTeamScript : MonoBehaviour {
 
 	public KMBombInfo Bomb;
 	public KMAudio Audio;
