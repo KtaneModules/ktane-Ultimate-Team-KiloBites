@@ -34,12 +34,16 @@ public class UltimateTeamScript : MonoBehaviour
     public Image throbber;
     public MeshRenderer LED;
     public MeshRenderer surface;
+    public Sprite[] profilePictures;
+    public Image[] profilePictureRends;
+    public Text[] expertNameRends;
 
     private KMAudio.KMAudioRef Sound;
     private Coroutine mainButtonsAnimCoroutine;
     private List<KtaneModule> allMods;
     private Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
+    private List<int> experts = new List<int>();
     private int[] mods = new int[12];
     private bool[] bossIx = new bool[12];
     private bool[] needyIx = new bool[12];
@@ -182,13 +186,20 @@ public class UltimateTeamScript : MonoBehaviour
                 icons[i].texture.filterMode = FilterMode.Point;
             }
         }
+        experts = Enumerable.Range(0, profilePictures.Length).ToList();
+        experts.Shuffle();
+        experts = experts.Take(6).ToList();
         displaySprites();
     }
 
     void displaySprites()
     {
         for (int i = 0; i < 6; i++)
+        {
             iconRender[i].sprite = icons[bombFlipped ? i + 6 : i];
+            profilePictureRends[i].sprite = profilePictures[experts[i]];
+            expertNameRends[i].text = profilePictures[experts[i]].name.ToUpperInvariant();
+        }
     }
 
     void Update()
