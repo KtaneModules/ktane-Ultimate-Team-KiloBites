@@ -41,6 +41,7 @@ public class UltimateTeamScript : MonoBehaviour
     private KMAudio.KMAudioRef Sound;
     private Coroutine mainButtonsAnimCoroutine;
     private List<KtaneModule> allMods;
+    private string[] moduleNames = new string[12];
     private Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
@@ -64,15 +65,15 @@ public class UltimateTeamScript : MonoBehaviour
             expertCards[x].OnInteract += delegate { if (!cannotPress && rightMenu) cardPress(x); return false; };
             expertCards[x].OnHighlight += delegate { expertCards[x].GetComponent<Image>().sprite = expertBGSprites[1]; };
             expertCards[x].OnHighlightEnded += delegate { expertCards[x].GetComponent<Image>().sprite = expertBGSprites[0]; };
-            tickMarks[x].transform.localScale = new Vector3();
+            tickMarks[x].transform.localScale = Vector3.zero;
         }
         mainButtons[0].transform.localPosition = new Vector3(mainButtons[0].transform.localPosition.x, 0.0078f, mainButtons[0].transform.localPosition.z);
         flipBombButton.OnInteract += delegate { if (!cannotPress && !rightMenu) flipBombButtonPress(); return false; };
         flipBombButton.OnHighlight += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[1]; };
         flipBombButton.OnHighlightEnded += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[0]; };
-        bombEdge.transform.localScale = new Vector3();
+        bombEdge.transform.localScale = Vector3.zero;
         expertCards[0].transform.parent.localPosition = new Vector3(0.2f, 0, 0);
-        bombCasing.transform.parent.localPosition = new Vector3();
+        bombCasing.transform.parent.localPosition = Vector3.zero;
         StartCoroutine(throb());
     }
 
@@ -87,7 +88,7 @@ public class UltimateTeamScript : MonoBehaviour
         bossIx[b] = boss;
         StartCoroutine(getJson());
         StartCoroutine(getSpriteSheet());
-        bombCasing.transform.parent.localScale = new Vector3();
+        bombCasing.transform.parent.localScale = Vector3.zero;
     }
 
     IEnumerator getJson()
@@ -108,8 +109,8 @@ public class UltimateTeamScript : MonoBehaviour
             StartCoroutine(LEDFlash());
             raw = request.downloadHandler.text;
         }
-        bombCasing.transform.parent.localScale = new Vector3(1, 1, 1);
-        throbber.transform.parent.localScale = new Vector3();
+        bombCasing.transform.parent.localScale = Vector3.one;
+        throbber.transform.parent.localScale = Vector3.zero;
         allMods = JsonConvert.DeserializeObject<Root>(raw).KtaneModules;
 
         while (spriteSheet == null)
@@ -154,7 +155,7 @@ public class UltimateTeamScript : MonoBehaviour
     void cardPress(int pos)
     {
         selected[pos] = !selected[pos];
-        tickMarks[pos].transform.localScale = selected[pos] ? new Vector3(1, 1, 1) : new Vector3();
+        tickMarks[pos].transform.localScale = selected[pos] ? Vector3.one : Vector3.zero;
         if (Sound != null)
             Sound.StopSound();
         Sound = Audio.HandlePlaySoundAtTransformWithRef(selected[pos] ? "tick" : "erase", tickMarks[pos].transform, false);
@@ -249,7 +250,7 @@ public class UltimateTeamScript : MonoBehaviour
         }
         bombCasing.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
         bombCasing.transform.localPosition = new Vector3(0, bombCasing.transform.localPosition.y, 0);
-        bombEdge.transform.localScale = new Vector3();
+        bombEdge.transform.localScale = Vector3.zero;
         bombEdge.transform.localPosition = new Vector3(0.06975f, bombEdge.transform.localPosition.y, 0);
         cannotPress = false;
     }
