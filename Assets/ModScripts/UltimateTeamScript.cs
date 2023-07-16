@@ -227,7 +227,7 @@ public class UltimateTeamScript : MonoBehaviour
     {
         Module.HandlePass();
         stamp.transform.localScale = Vector3.one;
-        expertCards[3].AddInteractionPunch();
+        expertCards[3].AddInteractionPunch(5f);
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.Stamp, stamp.transform);
         expertCards[0].transform.parent.localScale = Vector3.zero;
         bombCasing.transform.parent.localScale = Vector3.zero;
