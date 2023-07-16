@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -389,7 +389,7 @@ Prefab:
         type: 2}
       propertyPath: profilePictures.Array.data[27]
       value: 
-      objectReference: {fileID: 21300000, guid: c0dab7dba77f04244b2b61f886cfa883,
+      objectReference: {fileID: 21300000, guid: d86113ccca889bf4588b24bb418b62c2,
         type: 3}
     - target: {fileID: 114037591411734048, guid: d17dbae31d265bb48be96785547d7c84,
         type: 2}
