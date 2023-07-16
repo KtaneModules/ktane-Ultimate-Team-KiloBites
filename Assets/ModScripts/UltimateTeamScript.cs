@@ -20,9 +20,8 @@ public class UltimateTeamScript : MonoBehaviour
     public KMAudio Audio;
     public KMBombModule Module;
     public Image[] iconRender;
-    public Texture offlineSprite;
+    public Image[] expertRender1, expertRender2, expertRender3, expertRender4, expertRender5, expertRender6;
     public Sprite timer;
-    public TextAsset offlineJson;
     public KMSelectable[] mainButtons;
     public KMSelectable flipBombButton;
     public KMSelectable[] expertCards;
@@ -40,9 +39,9 @@ public class UltimateTeamScript : MonoBehaviour
 
     private KMAudio.KMAudioRef Sound;
     private Coroutine mainButtonsAnimCoroutine;
-    private List<KtaneModule> allMods;
+    private static List<KtaneModule> allMods;
     private string[] moduleNames = new string[12];
-    private Texture spriteSheet;
+    private static Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
     private int[] mods = new int[12];
@@ -86,53 +85,43 @@ public class UltimateTeamScript : MonoBehaviour
 
         needyIx[a] = needy;
         bossIx[b] = boss;
-        StartCoroutine(getJson());
-        StartCoroutine(getSpriteSheet());
+
         bombCasing.transform.parent.localScale = Vector3.zero;
-    }
 
-    IEnumerator getJson()
-    {
-        UnityWebRequest request = UnityWebRequest.Get("https://ktane.timwi.de/json/raw");
-
-        string raw;
-        yield return request.SendWebRequest();
-
-        if (request.error != null)
+        if (spriteSheet == null && allMods == null)
         {
-            Log("Connection error! Using obtained RAW JSON from 7/14/23.");
-            raw = offlineJson.text;
+            StartCoroutine(setup());
         }
         else
         {
-            Log("The JSON has now been obtained.");
-            StartCoroutine(LEDFlash());
-            raw = request.downloadHandler.text;
+            bombCasing.transform.parent.localScale = Vector3.one;
+            throbber.transform.parent.localScale = Vector3.zero;
+            generateModule();
         }
+    }
+
+    IEnumerator setup()
+    {
+        var utService = FindObjectOfType<UltimateTeamService>();
+
+        if (utService == null)
+        {
+            throw new Exception("It cannot find the service!");
+        }
+
+        yield return new WaitUntil(() => utService.loaded);
+
+        if (utService.connectedJson && utService.connectedSprite)
+        {
+            StartCoroutine(LEDFlash());
+        }
+
+        allMods = utService.allMods;
+        spriteSheet = utService.spriteSheet;
         bombCasing.transform.parent.localScale = Vector3.one;
         throbber.transform.parent.localScale = Vector3.zero;
-        allMods = JsonConvert.DeserializeObject<Root>(raw).KtaneModules;
-
-        while (spriteSheet == null)
-            yield return null;
         generateModule();
-    }
 
-    IEnumerator getSpriteSheet()
-    {
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture("https://ktane.timwi.de/iconsprite");
-        yield return request.SendWebRequest();
-
-        if (request.error != null)
-        {
-            Log("Connection error! Using default spritesheet from 7/14/23.");
-            spriteSheet = offlineSprite;
-        }
-        else
-        {
-            Log("The spritesheet has now been obtained.");
-            spriteSheet = ((DownloadHandlerTexture)request.downloadHandler).texture;
-        }
     }
 
     void mainButtonPress(int pos)
@@ -170,7 +159,9 @@ public class UltimateTeamScript : MonoBehaviour
         for (int i = 0; i < 12; i++)
         {
             if (mods[i] == -1)
+            {
                 icons[i] = timer;
+            }
             else
             {
                 var types = new[] { "FullBoss", "Needy", "Widget" };
@@ -200,6 +191,31 @@ public class UltimateTeamScript : MonoBehaviour
             iconRender[i].sprite = icons[bombFlipped ? i + 6 : i];
             profilePictureRends[i].sprite = profilePictures[experts[i]];
             expertNameRends[i].text = profilePictures[experts[i]].name.ToUpperInvariant();
+
+            for (int j = 0; j < 2; j++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        expertRender1[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        break;
+                    case 1:
+                        expertRender2[j].enabled = mods[bombFlipped ? i + 6 : i] != -1; 
+                        break;
+                    case 2:
+                        expertRender3[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        break;
+                    case 3:
+                        expertRender4[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        break;
+                    case 4:
+                        expertRender5[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        break;
+                    case 5:
+                        expertRender6[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        break;
+                }
+            }
         }
     }
 
