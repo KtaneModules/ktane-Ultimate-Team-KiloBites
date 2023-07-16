@@ -25,12 +25,14 @@ public class UltimateTeamScript : MonoBehaviour
     public KMSelectable[] mainButtons;
     public KMSelectable flipBombButton;
     public KMSelectable[] expertCards;
+    public KMSelectable statusLightButton;
     public Sprite[] arrowSprites;
     public Sprite[] expertBGSprites;
     public Image[] tickMarks;
     public Image bombCasing;
     public Image bombEdge;
     public Image throbber;
+    public Image stamp;
     public MeshRenderer LED;
     public MeshRenderer surface;
     public Sprite[] profilePictures;
@@ -70,9 +72,11 @@ public class UltimateTeamScript : MonoBehaviour
         flipBombButton.OnInteract += delegate { if (!cannotPress && !rightMenu) flipBombButtonPress(); return false; };
         flipBombButton.OnHighlight += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[1]; };
         flipBombButton.OnHighlightEnded += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[0]; };
+        statusLightButton.OnInteract += delegate { if (!cannotPress && rightMenu) solve(); return false; };
         bombEdge.transform.localScale = Vector3.zero;
         expertCards[0].transform.parent.localPosition = new Vector3(0.2f, 0, 0);
         bombCasing.transform.parent.localPosition = Vector3.zero;
+        stamp.transform.localScale = Vector3.zero;
         StartCoroutine(throb());
     }
 
@@ -219,9 +223,15 @@ public class UltimateTeamScript : MonoBehaviour
         }
     }
 
-    void Update()
+    void solve()
     {
-
+        Module.HandlePass();
+        stamp.transform.localScale = Vector3.one;
+        expertCards[3].AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.Stamp, stamp.transform);
+        expertCards[0].transform.parent.localScale = Vector3.zero;
+        bombCasing.transform.parent.localScale = Vector3.zero;
+        cannotPress = true;
     }
 
     private IEnumerator mainButtonsAnim(int pos, float duration = 0.05f)
