@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 using KModkit;
-using Newtonsoft.Json;
 using static UnityEngine.Random;
 using static UnityEngine.Debug;
 
@@ -43,6 +41,7 @@ public class UltimateTeamScript : MonoBehaviour
     private Coroutine mainButtonsAnimCoroutine;
     private static List<KtaneModule> allMods;
     private string[] moduleNames = new string[12];
+    private List<string> expertDifficulties = new List<string>();
     private static Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
@@ -82,6 +81,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     void Start()
     {
+        cannotPress = true;
         needy = Range(0, 2) == 0;
         boss = Range(0, 4) > 1;
         var a = Range(0, 12);
@@ -119,6 +119,7 @@ public class UltimateTeamScript : MonoBehaviour
         {
             StartCoroutine(LEDFlash());
         }
+        cannotPress = false;
 
         allMods = utService.allMods;
         spriteSheet = utService.spriteSheet;
@@ -165,6 +166,7 @@ public class UltimateTeamScript : MonoBehaviour
             if (mods[i] == -1)
             {
                 icons[i] = timer;
+                moduleNames[i] = "[TIMER]";
             }
             else
             {
@@ -180,8 +182,14 @@ public class UltimateTeamScript : MonoBehaviour
                 KtaneModule usedMod = allMods[mods[i]];
                 icons[i] = Sprite.Create(spriteSheet as Texture2D, new Rect(32 * usedMod.X, 32 * (maxY - usedMod.Y), 32, 32), new Vector2(0.5f, 0.5f));
                 icons[i].texture.filterMode = FilterMode.Point;
+                moduleNames[i] = usedMod.Name;
+                expertDifficulties.Add(usedMod.ExpertDifficulty);
             }
         }
+
+        Log(moduleNames.Join(", "));
+        Log(expertDifficulties.Join(", "));
+
         experts = Enumerable.Range(0, profilePictures.Length).ToList();
         experts.Shuffle();
         experts = experts.Take(6).ToList();
@@ -225,6 +233,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     private IEnumerator solve()
     {
+        moduleSolved = true;
         Module.HandlePass();
         stamp.transform.localScale = Vector3.one;
         expertCards[3].AddInteractionPunch(5f);
