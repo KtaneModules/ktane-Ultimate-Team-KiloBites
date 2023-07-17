@@ -51,6 +51,56 @@ public class UltimateTeamScript : MonoBehaviour
     private bool[] selected = new bool[6];
     private bool boss, bombFlipped, cannotPress, needy, rightMenu;
 
+    private static readonly Dictionary<string, difficulty> expertData = new Dictionary<string, difficulty>()
+    {
+        { "1254", difficulty.Easy },
+        { "alexcorruptor", difficulty.Easy },
+        { "axo", difficulty.Medium },
+        { "bigcrunch22", difficulty.Hard },
+        { "Cinnabar", difficulty.Medium },
+        { "crazycaleb", difficulty.VeryHard },
+        { "CyanixDash", difficulty.Easy },
+        { "Danielstigman", difficulty.VeryHard },
+        { "dicey", difficulty.Hard },
+        { "diffuse", difficulty.Medium },
+        { "diskoqs", difficulty.Easy },
+        { "espik", difficulty.VeryHard },
+        { "exish", difficulty.VeryHard },
+        { "floofy floofles", difficulty.Easy },
+        { "ghostsalt", difficulty.Medium },
+        { "goodhood", difficulty.Easy },
+        { "gwen", difficulty.Easy },
+        { "jygein", difficulty.Easy },
+        { "kilo", difficulty.Hard },
+        { "konoko", difficulty.Medium },
+        { "Kugel", difficulty.Hard },
+        { "kuro", difficulty.Easy },
+        { "lexa", difficulty.Medium },
+        { "lilyflair", difficulty.Easy },
+        { "lulu", difficulty.Medium },
+        { "mage", difficulty.Medium },
+        { "marksam", difficulty.VeryHard },
+        { "MasQuéÉlite", difficulty.Medium },
+        { "meh", difficulty.Hard },
+        { "nshep", difficulty.Hard },
+        { "obvious", difficulty.VeryHard },
+        { "piissii", difficulty.VeryHard },
+        { "quinn wuest", difficulty.Hard },
+        { "redpenguin", difficulty.Hard },
+        { "rosenothorns03", difficulty.Medium },
+        { "scoping landscape", difficulty.VeryHard },
+        { "setra", difficulty.Medium },
+        { "Sierra", difficulty.Easy },
+        { "tandycake", difficulty.Hard },
+        { "thefullestcircle", difficulty.Easy },
+        { "Timwi", difficulty.Hard },
+        { "varunaxx", difficulty.Hard },
+        { "witekwitek", difficulty.Medium },
+        { "xorote", difficulty.VeryHard },
+        { "zaakeil", difficulty.VeryHard },
+        { "zaphod", difficulty.VeryHard }
+    };
+
     void Awake()
     {
         moduleId = moduleIdCounter++;
