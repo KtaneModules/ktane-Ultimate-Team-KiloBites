@@ -40,68 +40,25 @@ public class UltimateTeamScript : MonoBehaviour
     private KMAudio.KMAudioRef Sound;
     private Coroutine mainButtonsAnimCoroutine;
     private static List<KtaneModule> allMods;
+    private List<KtaneModule> virtualBomb = new List<KtaneModule>();
+    private List<KtaneModule> realBomb = new List<KtaneModule>();
     private string[] moduleNames = new string[12];
     private List<string> expertDifficulties = new List<string>();
+    private List<List<bool>> expertProficiencies = new List<List<bool>>();
     private static Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
-    private string[] expertNameDifficulties = new string[6];
-    private string[] expertNames = new string[6];
+    private List<int> team = new List<int>();
+    private string[] currExpertPrefDiffs = new string[6];
+    private string[] currExpertNames = new string[6];
     private int[] mods = new int[12];
     private bool[] bossIx = new bool[12];
     private bool[] needyIx = new bool[12];
     private bool[] selected = new bool[6];
     private bool boss, bombFlipped, cannotPress, needy, rightMenu;
 
-    private static readonly string[][] expertData =
-    {
-        new string[] { "1254", "Easy" },
-        new string[] { "AlexCorruptor", "Easy" },
-        new string[] { "Axo", "Medium" },
-        new string[] { "BigCrunch22", "Hard" },
-        new string[] { "Cinnabar", "Medium" },
-        new string[] { "Crazycaleb", "VeryHard" },
-        new string[] { "CyanixDash", "Easy" },
-        new string[] { "Danielstigman", "VeryHard" },
-        new string[] { "dicey", "Hard" },
-        new string[] { "Diffuse", "Medium" },
-        new string[] { "diskoQs", "Easy" },
-        new string[] { "Espik", "VeryHard" },
-        new string[] { "eXish", "VeryHard" },
-        new string[] { "Floofy Floofles", "Easy" },
-        new string[] { "GhostSalt", "Medium" },
-        new string[] { "GoodHood", "Easy" },
-        new string[] { "Gwen", "Easy" },
-        new string[] { "JyGein", "Easy" },
-        new string[] { "Kilo", "Hard" },
-        new string[] { "Konoko", "Medium" },
-        new string[] { "Kugel", "Hard" },
-        new string[] { "Kuro", "Easy" },
-        new string[] { "Lexa", "Medium" },
-        new string[] { "LilyFlair", "Easy" },
-        new string[] { "Lulu", "Medium" },
-        new string[] { "Mage", "Medium" },
-        new string[] { "Marksam", "VeryHard" },
-        new string[] { "MasQuéÉlite", "Medium" },
-        new string[] { "meh", "Hard" },
-        new string[] { "NShep", "Hard" },
-        new string[] { "Obvious", "VeryHard" },
-        new string[] { "Piissii", "VeryHard" },
-        new string[] { "Quinn Wuest", "Hard" },
-        new string[] { "redpenguin", "Hard" },
-        new string[] { "Rosenothorns03", "Medium" },
-        new string[] { "Scoping Landscape", "VeryHard" },
-        new string[] { "Setra", "Medium" },
-        new string[] { "Sierra", "Easy" },
-        new string[] { "tandyCake", "Hard" },
-        new string[] { "TheFullestCircle", "Easy" },
-        new string[] { "Timwi", "Hard" },
-        new string[] { "Varunaxx", "Hard" },
-        new string[] { "WitekWitek", "Medium" },
-        new string[] { "xorote", "VeryHard" },
-        new string[] { "Zaakeil", "VeryHard" },
-        new string[] { "Zaphod", "VeryHard" }
-    };
+    private static readonly string[] expertNames = { "1254", "AlexCorruptor", "Axo", "BigCrunch22", "Cinnabar", "Crazycaleb", "CyanixDash", "Danielstigman", "dicey", "Diffuse", "diskoQs", "Espik", "eXish", "Floofy Floofles", "GhostSalt", "GoodHood", "Gwen", "JyGein", "Kilo", "Konoko", "Kugel", "Kuro", "Lexa", "LilyFlair", "Lulu", "Mage", "Marksam", "MasQuéÉlite", "meh", "NShep", "Obvious", "Piissii", "Quinn Wuest", "redpenguin", "Rosenothorns03", "Scoping Landscape", "Setra", "Sierra", "tandyCake", "TheFullestCircle", "Timwi", "Varunaxx", "WitekWitek", "xorote", "Zaakeil", "Zaphod" };
+    private static readonly string[] expertPreferredDiffs = { "Easy", "Easy", "Medium", "Hard", "Medium", "VeryHard", "Easy", "VeryHard", "Hard", "Medium", "Easy", "VeryHard", "VeryHard", "Easy", "Medium", "Easy", "Easy", "Easy", "Hard", "Medium", "Hard", "Easy", "Medium", "Easy", "Medium", "Medium", "VeryHard", "Medium", "Hard", "Hard", "VeryHard", "VeryHard", "Hard", "Hard", "Medium", "VeryHard", "Medium", "Easy", "Hard", "Easy", "Hard", "Hard", "Medium", "VeryHard", "VeryHard", "VeryHard" };
 
     void Awake()
     {
@@ -123,7 +80,23 @@ public class UltimateTeamScript : MonoBehaviour
         flipBombButton.OnInteract += delegate { if (!cannotPress && !rightMenu) flipBombButtonPress(); return false; };
         flipBombButton.OnHighlight += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[1]; };
         flipBombButton.OnHighlightEnded += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[0]; };
-        statusLightButton.OnInteract += delegate { if (!cannotPress && rightMenu) StartCoroutine(solve()); return false; };
+        statusLightButton.OnInteract += delegate
+        {
+            if (!cannotPress && rightMenu)
+            {
+                bool correct = true;
+                for (int i = 0; i < 6; i++)
+                    if (selected[i] == team.Contains(i))
+                        correct = false;
+                if (correct)
+                    StartCoroutine(solve());
+                else
+                {
+                    Module.HandleStrike();
+                }
+            }
+            return false;
+        };
         bombEdge.transform.localScale = Vector3.zero;
         expertCards[0].transform.parent.localPosition = new Vector3(0.2f, 0, 0);
         bombCasing.transform.parent.localPosition = Vector3.zero;
@@ -145,9 +118,7 @@ public class UltimateTeamScript : MonoBehaviour
         bombCasing.transform.parent.localScale = Vector3.zero;
 
         if (spriteSheet == null && allMods == null)
-        {
             StartCoroutine(setup());
-        }
         else
         {
             bombCasing.transform.parent.localScale = Vector3.one;
@@ -161,16 +132,12 @@ public class UltimateTeamScript : MonoBehaviour
         var utService = FindObjectOfType<UltimateTeamService>();
 
         if (utService == null)
-        {
             throw new Exception("It cannot find the service!");
-        }
 
         yield return new WaitUntil(() => utService.loaded);
 
         if (utService.connectedJson && utService.connectedSprite)
-        {
             StartCoroutine(LEDFlash());
-        }
         cannotPress = false;
 
         allMods = utService.allMods;
@@ -233,12 +200,17 @@ public class UltimateTeamScript : MonoBehaviour
                     mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type)).PickRandom();
 
                 KtaneModule usedMod = allMods[mods[i]];
+                virtualBomb.Add(usedMod);
                 icons[i] = Sprite.Create(spriteSheet as Texture2D, new Rect(32 * usedMod.X, 32 * (maxY - usedMod.Y), 32, 32), new Vector2(0.5f, 0.5f));
                 icons[i].texture.filterMode = FilterMode.Point;
                 moduleNames[i] = usedMod.Name;
                 expertDifficulties.Add(usedMod.ExpertDifficulty);
             }
         }
+        List<string> ids = allMods.Select(x => x.ModuleID).ToList();
+        foreach (string modID in Bomb.GetModuleIDs())
+            if (ids.Contains(modID))
+                realBomb.Add(allMods[ids.IndexOf(modID)]);
 
         Log(moduleNames.Join(", "));
         Log(expertDifficulties.Join(", "));
@@ -249,8 +221,8 @@ public class UltimateTeamScript : MonoBehaviour
 
         for (int i = 0; i < 6; i++)
         {
-            expertNames[i] = expertData[experts[i]][0];
-            expertNameDifficulties[i] = expertData[experts[i]][1];
+            currExpertNames[i] = expertNames[experts[i]];
+            currExpertPrefDiffs[i] = expertPreferredDiffs[experts[i]];
         }
 
         displaySprites();
@@ -263,10 +235,9 @@ public class UltimateTeamScript : MonoBehaviour
         {
             iconRender[i].sprite = icons[bombFlipped ? i + 6 : i];
             profilePictureRends[i].sprite = profilePictures[experts[i]];
-            expertNameRends[i].text = expertNames[i].ToUpperInvariant();
+            expertNameRends[i].text = currExpertNames[i].ToUpperInvariant();
 
             for (int j = 0; j < 2; j++)
-            {
                 switch (i)
                 {
                     case 0:
@@ -288,15 +259,42 @@ public class UltimateTeamScript : MonoBehaviour
                         expertRender6[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                 }
-            }
         }
     }
 
     void calculations()
     {
-        var baseScores = ScoringSystem.baseScores(Bomb.GetSerialNumber());
-
-        Log(baseScores.Join());
+        var scores = ScoringSystem.baseScores(Bomb.GetSerialNumber());
+        Log(scores.Join());
+        //for (int i = 0; i < 11; i++)
+        //    for (int j = 0; j < 6; j++)
+        //        if (expertProficiencies[j][i])
+        //            switch (expertDifficulties[i])
+        //            {
+        //                case "Easy":
+        //                    scores[j] += 1;
+        //                    break;
+        //                case "Medium":
+        //                    scores[j] += 2;
+        //                    break;
+        //                case "Hard":
+        //                    scores[j] += 3;
+        //                    break;
+        //                case "VeryHard":
+        //                    scores[j] += 4;
+        //                    break;
+        //}
+        for (int i = 0; i < 6; i++)
+            scores[i] += expertDifficulties.Where(x => x == currExpertPrefDiffs[i]).Count();
+        scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray());
+        Log(scores.Join());
+        team = Enumerable.Range(0, 6).ToList();
+        team = team.Select((x, ix) => new { x, ix }).OrderBy(x => scores[x.ix]).Select(x => x.x).ToList();
+        if (expertDifficulties.Count(x => x == "VeryEasy") >= 4)
+            team = team.Take(1).ToList();
+        else
+            team = team.Take(2).ToList();
+        Debug.Log(team.Join(", "));
     }
 
     private IEnumerator solve()
@@ -397,7 +395,7 @@ public class UltimateTeamScript : MonoBehaviour
         }
     }
 
-    private IEnumerator throb (float interval = 0.05f)
+    private IEnumerator throb(float interval = 0.05f)
     {
         int i = 0;
         while (true)
