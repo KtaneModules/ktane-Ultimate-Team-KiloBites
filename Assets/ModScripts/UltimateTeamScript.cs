@@ -45,60 +45,62 @@ public class UltimateTeamScript : MonoBehaviour
     private static Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
+    private string[] expertNameDifficulties = new string[6];
+    private string[] expertNames = new string[6];
     private int[] mods = new int[12];
     private bool[] bossIx = new bool[12];
     private bool[] needyIx = new bool[12];
     private bool[] selected = new bool[6];
     private bool boss, bombFlipped, cannotPress, needy, rightMenu;
 
-    private static readonly Dictionary<string, difficulty> expertData = new Dictionary<string, difficulty>()
+    private static readonly string[][] expertData =
     {
-        { "1254", difficulty.Easy },
-        { "alexcorruptor", difficulty.Easy },
-        { "axo", difficulty.Medium },
-        { "bigcrunch22", difficulty.Hard },
-        { "Cinnabar", difficulty.Medium },
-        { "crazycaleb", difficulty.VeryHard },
-        { "CyanixDash", difficulty.Easy },
-        { "Danielstigman", difficulty.VeryHard },
-        { "dicey", difficulty.Hard },
-        { "diffuse", difficulty.Medium },
-        { "diskoqs", difficulty.Easy },
-        { "espik", difficulty.VeryHard },
-        { "exish", difficulty.VeryHard },
-        { "floofy floofles", difficulty.Easy },
-        { "ghostsalt", difficulty.Medium },
-        { "goodhood", difficulty.Easy },
-        { "gwen", difficulty.Easy },
-        { "jygein", difficulty.Easy },
-        { "kilo", difficulty.Hard },
-        { "konoko", difficulty.Medium },
-        { "Kugel", difficulty.Hard },
-        { "kuro", difficulty.Easy },
-        { "lexa", difficulty.Medium },
-        { "lilyflair", difficulty.Easy },
-        { "lulu", difficulty.Medium },
-        { "mage", difficulty.Medium },
-        { "marksam", difficulty.VeryHard },
-        { "MasQuéÉlite", difficulty.Medium },
-        { "meh", difficulty.Hard },
-        { "nshep", difficulty.Hard },
-        { "obvious", difficulty.VeryHard },
-        { "piissii", difficulty.VeryHard },
-        { "quinn wuest", difficulty.Hard },
-        { "redpenguin", difficulty.Hard },
-        { "rosenothorns03", difficulty.Medium },
-        { "scoping landscape", difficulty.VeryHard },
-        { "setra", difficulty.Medium },
-        { "Sierra", difficulty.Easy },
-        { "tandycake", difficulty.Hard },
-        { "thefullestcircle", difficulty.Easy },
-        { "Timwi", difficulty.Hard },
-        { "varunaxx", difficulty.Hard },
-        { "witekwitek", difficulty.Medium },
-        { "xorote", difficulty.VeryHard },
-        { "zaakeil", difficulty.VeryHard },
-        { "zaphod", difficulty.VeryHard }
+        new string[] { "1254", "Easy" },
+        new string[] { "AlexCorruptor", "Easy" },
+        new string[] { "Axo", "Medium" },
+        new string[] { "BigCrunch22", "Hard" },
+        new string[] { "Cinnabar", "Medium" },
+        new string[] { "Crazycaleb", "VeryHard" },
+        new string[] { "CyanixDash", "Easy" },
+        new string[] { "Danielstigman", "VeryHard" },
+        new string[] { "dicey", "Hard" },
+        new string[] { "Diffuse", "Medium" },
+        new string[] { "diskoQs", "Easy" },
+        new string[] { "Espik", "VeryHard" },
+        new string[] { "eXish", "VeryHard" },
+        new string[] { "Floofy Floofles", "Easy" },
+        new string[] { "GhostSalt", "Medium" },
+        new string[] { "GoodHood", "Easy" },
+        new string[] { "Gwen", "Easy" },
+        new string[] { "JyGein", "Easy" },
+        new string[] { "Kilo", "Hard" },
+        new string[] { "Konoko", "Medium" },
+        new string[] { "Kugel", "Hard" },
+        new string[] { "Kuro", "Easy" },
+        new string[] { "Lexa", "Medium" },
+        new string[] { "LilyFlair", "Easy" },
+        new string[] { "Lulu", "Medium" },
+        new string[] { "Mage", "Medium" },
+        new string[] { "Marksam", "VeryHard" },
+        new string[] { "MasQuéÉlite", "Medium" },
+        new string[] { "meh", "Hard" },
+        new string[] { "NShep", "Hard" },
+        new string[] { "Obvious", "VeryHard" },
+        new string[] { "Piissii", "VeryHard" },
+        new string[] { "Quinn Wuest", "Hard" },
+        new string[] { "redpenguin", "Hard" },
+        new string[] { "Rosenothorns03", "Medium" },
+        new string[] { "Scoping Landscape", "VeryHard" },
+        new string[] { "Setra", "Medium" },
+        new string[] { "Sierra", "Easy" },
+        new string[] { "tandyCake", "Hard" },
+        new string[] { "TheFullestCircle", "Easy" },
+        new string[] { "Timwi", "Hard" },
+        new string[] { "Varunaxx", "Hard" },
+        new string[] { "WitekWitek", "Medium" },
+        new string[] { "xorote", "VeryHard" },
+        new string[] { "Zaakeil", "VeryHard" },
+        new string[] { "Zaphod", "VeryHard" }
     };
 
     void Awake()
@@ -217,6 +219,7 @@ public class UltimateTeamScript : MonoBehaviour
             {
                 icons[i] = timer;
                 moduleNames[i] = "[TIMER]";
+                expertDifficulties.Add("[TIMER]");
             }
             else
             {
@@ -227,7 +230,7 @@ public class UltimateTeamScript : MonoBehaviour
                 else if (needyIx[i])
                     mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[1].Equals(allMods[x].Type)).PickRandom();
                 else
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Contains(allMods[x].Type)).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type)).PickRandom();
 
                 KtaneModule usedMod = allMods[mods[i]];
                 icons[i] = Sprite.Create(spriteSheet as Texture2D, new Rect(32 * usedMod.X, 32 * (maxY - usedMod.Y), 32, 32), new Vector2(0.5f, 0.5f));
@@ -243,7 +246,15 @@ public class UltimateTeamScript : MonoBehaviour
         experts = Enumerable.Range(0, profilePictures.Length).ToList();
         experts.Shuffle();
         experts = experts.Take(6).ToList();
+
+        for (int i = 0; i < 6; i++)
+        {
+            expertNames[i] = expertData[experts[i]][0];
+            expertNameDifficulties[i] = expertData[experts[i]][1];
+        }
+
         displaySprites();
+        calculations();
     }
 
     void displaySprites()
@@ -252,33 +263,40 @@ public class UltimateTeamScript : MonoBehaviour
         {
             iconRender[i].sprite = icons[bombFlipped ? i + 6 : i];
             profilePictureRends[i].sprite = profilePictures[experts[i]];
-            expertNameRends[i].text = profilePictures[experts[i]].name.ToUpperInvariant();
+            expertNameRends[i].text = expertNames[i].ToUpperInvariant();
 
             for (int j = 0; j < 2; j++)
             {
                 switch (i)
                 {
                     case 0:
-                        expertRender1[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        expertRender1[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                     case 1:
-                        expertRender2[j].enabled = mods[bombFlipped ? i + 6 : i] != -1; 
+                        expertRender2[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                     case 2:
-                        expertRender3[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        expertRender3[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                     case 3:
-                        expertRender4[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        expertRender4[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                     case 4:
-                        expertRender5[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        expertRender5[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                     case 5:
-                        expertRender6[j].enabled = mods[bombFlipped ? i + 6 : i] != -1;
+                        expertRender6[j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
                         break;
                 }
             }
         }
+    }
+
+    void calculations()
+    {
+        var baseScores = ScoringSystem.baseScores(Bomb.GetSerialNumber());
+
+        Log(baseScores.Join());
     }
 
     private IEnumerator solve()
