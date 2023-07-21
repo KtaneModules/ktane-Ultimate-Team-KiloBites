@@ -174,6 +174,7 @@ GameObject:
   - component: {fileID: 4533533954214886}
   - component: {fileID: 33665964010803616}
   - component: {fileID: 23585077458718940}
+  - component: {fileID: 114891890243878130}
   m_Layer: 0
   m_Name: LED
   m_TagString: Untagged
@@ -391,6 +392,7 @@ GameObject:
   - component: {fileID: 33552507932317352}
   - component: {fileID: 23887503546757732}
   - component: {fileID: 114727224440730262}
+  - component: {fileID: 114958523679934720}
   m_Layer: 0
   m_Name: Mission Button
   m_TagString: Untagged
@@ -426,6 +428,7 @@ GameObject:
   - component: {fileID: 33006761621442672}
   - component: {fileID: 23382875862399880}
   - component: {fileID: 114628526906723548}
+  - component: {fileID: 114268376437450456}
   m_Layer: 0
   m_Name: Experts Button
   m_TagString: Untagged
@@ -587,6 +590,7 @@ GameObject:
   - component: {fileID: 4845819471332496}
   - component: {fileID: 23636605808242608}
   - component: {fileID: 102673611443885064}
+  - component: {fileID: 114868596852233004}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -741,6 +745,7 @@ GameObject:
   - component: {fileID: 4962510200118904}
   - component: {fileID: 33940210803891656}
   - component: {fileID: 23346197866265970}
+  - component: {fileID: 114658582602965424}
   m_Layer: 0
   m_Name: ModelComponent
   m_TagString: Untagged
@@ -758,6 +763,7 @@ GameObject:
   - component: {fileID: 4975617136599450}
   - component: {fileID: 33349824720137044}
   - component: {fileID: 23266535448027402}
+  - component: {fileID: 114682167784638762}
   m_Layer: 0
   m_Name: Surface
   m_TagString: Untagged
@@ -826,6 +832,7 @@ GameObject:
   - component: {fileID: 4571628847709158}
   - component: {fileID: 23884678339416766}
   - component: {fileID: 102864189623125514}
+  - component: {fileID: 114121818666887592}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -1858,7 +1865,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1885,7 +1892,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1933,6 +1940,7 @@ MonoBehaviour:
   - {fileID: 114594198749028312}
   - {fileID: 114673296080421362}
   timer: {fileID: 21300000, guid: 7572e5602852f5e4f871e09c2be5ba2d, type: 3}
+  placeholder: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   mainButtons:
   - {fileID: 114727224440730262}
   - {fileID: 114628526906723548}
@@ -2103,7 +2111,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114048239635167414
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2123,7 +2131,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2212,6 +2220,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114121818666887592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1659187445674836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - GUI/KT 3D Text Diffuse
 --- !u!114 &114136061552812862
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2451,7 +2472,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114224850139835730
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2471,7 +2492,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2514,7 +2535,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2522,6 +2543,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114268376437450456
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1419415362839272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114292857726881778
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2641,7 +2675,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2708,7 +2742,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114510757085237604
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2768,7 +2802,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114541656811362060
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2878,7 +2912,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114594198749028312
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2898,7 +2932,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2952,7 +2986,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3001,7 +3035,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3020,6 +3054,19 @@ MonoBehaviour:
   m_Script: {fileID: 2144496390, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114658582602965424
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1613141513597088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114668033651750718
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3039,7 +3086,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3093,7 +3140,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3101,6 +3148,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114682167784638762
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1620285767531528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - Unlit/Texture
 --- !u!114 &114686199823222576
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3147,7 +3207,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3354,7 +3414,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3381,7 +3441,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3408,7 +3468,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3511,7 +3571,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3582,6 +3642,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
+--- !u!114 &114868596852233004
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1477662267801746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - GUI/KT 3D Text Diffuse
 --- !u!114 &114875137819914692
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3594,6 +3667,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &114891890243878130
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1117071177863384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - Unlit/Color
 --- !u!114 &114909928996323058
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3613,7 +3699,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3651,7 +3737,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: a2320b65dc3f7f849a1439565fdf6d7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc7598aaaaf19d64492e1153067820bb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3705,7 +3791,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: GHOSTSALT
+  m_Text: HERSHEL LAYTON
 --- !u!114 &114950737417981754
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3733,6 +3819,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114958523679934720
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1321647222503552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
 --- !u!222 &222005712661086918
 CanvasRenderer:
   m_ObjectHideFlags: 1

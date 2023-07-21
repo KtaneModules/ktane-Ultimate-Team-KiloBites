@@ -30,7 +30,7 @@ public class UltimateTeamService : MonoBehaviour {
 
         if (request.error != null)
         {
-            Log("Connection error! Using offline raw JSON from 7/14/23.");
+            Log("Connection error! Using offline raw JSON from 7/21/23.");
             raw = offlineJson.text;
         }
         else
@@ -51,12 +51,12 @@ public class UltimateTeamService : MonoBehaviour {
 
     IEnumerator getSpriteSheet()
     {
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture("https://ktane.timwi.de/iconsprite");
+        var request = UnityWebRequestTexture.GetTexture("https://ktane.timwi.de/iconsprite");
         yield return request.SendWebRequest();
 
         if (request.error != null)
         {
-            Log("Connection error! Using default spritesheet from 7/14/23.");
+            Log("Connection error! Using default spritesheet from 7/21/23.");
             spriteSheet = offlineSprite;
         }
         else

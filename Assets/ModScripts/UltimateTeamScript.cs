@@ -19,7 +19,7 @@ public class UltimateTeamScript : MonoBehaviour
     public KMBombModule Module;
     public Image[] iconRender;
     public Image[] expertRender1, expertRender2, expertRender3, expertRender4, expertRender5, expertRender6;
-    public Sprite timer;
+    public Sprite timer, placeholder;
     public KMSelectable[] mainButtons;
     public KMSelectable flipBombButton;
     public KMSelectable[] expertCards;
@@ -57,6 +57,7 @@ public class UltimateTeamScript : MonoBehaviour
     private bool[] needyIx = new bool[12];
     private bool[] selected = new bool[6];
     private bool boss, bombFlipped, cannotPress, needy, rightMenu;
+    private static string connected;
 
     private Image[][] renders;
 
@@ -88,7 +89,7 @@ public class UltimateTeamScript : MonoBehaviour
         flipBombButton.OnHighlightEnded += delegate { flipBombButton.GetComponent<Image>().sprite = arrowSprites[0]; };
         statusLightButton.OnInteract += delegate
         {
-            if (!cannotPress && rightMenu)
+            if (!cannotPress && rightMenu && !moduleSolved)
             {
                 bool correct = true;
                 for (int i = 0; i < 6; i++)
@@ -137,6 +138,7 @@ public class UltimateTeamScript : MonoBehaviour
         {
             bombCasing.transform.parent.localScale = Vector3.one;
             throbber.transform.parent.localScale = Vector3.zero;
+            Log($"[Ultimate Team #{moduleId}] {connected}");
             generateModule();
         }
     }
@@ -153,6 +155,10 @@ public class UltimateTeamScript : MonoBehaviour
         if (utService.connectedJson && utService.connectedSprite)
             StartCoroutine(LEDFlash());
         cannotPress = false;
+
+        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 7/21/23.";
+
+        Log($"[Ultimate Team #{moduleId}] {connected}");
 
         allMods = utService.allMods;
         spriteSheet = utService.spriteSheet;
@@ -211,7 +217,7 @@ public class UltimateTeamScript : MonoBehaviour
                 else if (needyIx[i])
                     mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[1].Equals(allMods[x].Type)).PickRandom();
                 else
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type)).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
 
                 KtaneModule usedMod = allMods[mods[i]];
                 virtualBomb.Add(usedMod);
@@ -226,8 +232,7 @@ public class UltimateTeamScript : MonoBehaviour
             if (ids.Contains(modID))
                 realBomb.Add(allMods[ids.IndexOf(modID)]);
 
-        Log(moduleNames.Join(", "));
-        Log(expertDifficulties.Join(", "));
+        Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows: {moduleNames.Join(", ")}");
 
         experts = Enumerable.Range(0, profilePictures.Length).ToList();
         experts.Shuffle();
@@ -239,6 +244,9 @@ public class UltimateTeamScript : MonoBehaviour
             currExpertPrefDiffs[i] = expertPreferredDiffs[experts[i]];
         }
 
+        Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
+        Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard", "Very Hard")}");
+
         assignProficiencies();
         displaySprites();
         calculations();
@@ -246,8 +254,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     void assignProficiencies()
     {
-        //Queue<int> q = new Queue<int>(Enumerable.Range(0, profilePictures.Length * 3).Select(x => x % 6).Where(x => experts.Contains(x)));
-        tryagain:
+    tryagain:
         var q = new List<List<int>>();
         var q2 = new List<int>();
 
@@ -279,7 +286,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     List<int> genProficiency(List<List<int>> q)
     {
-        tryagain:
+    tryagain:
         var prob = Range(0, 5);
         List<int> ixs = Enumerable.Range(0, 12).Where(x => mods[x] != -1).ToList().Shuffle().Take(prob == 0 ? 1 : prob == 4 ? 3 : 2).ToList();
 
@@ -306,10 +313,13 @@ public class UltimateTeamScript : MonoBehaviour
             expertNameRends[i].text = currExpertNames[i].ToUpperInvariant();
 
             for (int j = 0; j < 2; j++)
+            {
+                renders[i][j].sprite = placeholder;
                 renders[i][j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
+            }
+
             for (int j = 0; j < moduleProf[bombFlipped ? i + 6 : i].Count; j++)
             {
-                Log(i.ToString() + " " + j.ToString() + " " + moduleProf.Select(x => x.Join(", ")).Join(" | "));
                 renders[i][j].sprite = profilePictures[experts[moduleProf[bombFlipped ? i + 6 : i][j]]];
             }
         }
@@ -322,37 +332,26 @@ public class UltimateTeamScript : MonoBehaviour
     void calculations()
     {
         var scores = ScoringSystem.baseScores(Bomb.GetSerialNumber());
-        Log(scores.Join());
-        //for (int i = 0; i < 11; i++)
-        //    for (int j = 0; j < 6; j++)
-        //        if (expertProficiencies[j][i])
-        //            switch (expertDifficulties[i])
-        //            {
-        //                case "Easy":
-        //                    scores[j] += 1;
-        //                    break;
-        //                case "Medium":
-        //                    scores[j] += 2;
-        //                    break;
-        //                case "Hard":
-        //                    scores[j] += 3;
-        //                    break;
-        //                case "VeryHard":
-        //                    scores[j] += 4;
-        //                    break;
-        //}
+        Log($"[Ultimate Team #{moduleId}] The assigned scores for the experts in reading order: {scores.Join(", ")}");
 
         for (int i = 0; i < 6; i++)
             scores[i] += expertDifficulties.Where(x => x == currExpertPrefDiffs[i]).Count();
-        scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray(), moduleId);
-        Log(scores.Join());
+        scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray(), moduleId, expertPreferredDiffs);
+        Log($"[Ultimate Team #{moduleId}] After calculating each score by difficulties present on the virtual bomb and applying conditions for each expert: {scores.Join(", ")}");
         team = Enumerable.Range(0, 6).ToList();
         team = team.Select((x, ix) => new { x, ix }).OrderBy(x => scores[x.ix]).Select(x => x.x).ToList();
         if (expertDifficulties.Count(x => x == "VeryEasy") >= 4)
+        {
             team = team.Take(1).ToList();
+            Log($"[Ultimate Team #{moduleId}] Since there are at least 4 Very Easy modules on the virtual bomb, you'll be taking only one expert.");
+        }
         else
+        {
             team = team.Take(2).ToList();
-        Log(team.Join(", "));
+            Log($"[Ultimate Team #{moduleId}] Since there are less Very Easy modules on the virtual bomb, you'll be taking two experts.");
+        }
+        var resultFormat = team.Count == 1 ? $"According to the highest score, you should take {currExpertNames[team[0]]}." : $"According to the two highest scores, you should take {currExpertNames[team[0]]} and {currExpertNames[team[1]]}.";
+        Log($"[Ultimate Team #{moduleId}] {resultFormat}");
     }
 
     private IEnumerator solve()

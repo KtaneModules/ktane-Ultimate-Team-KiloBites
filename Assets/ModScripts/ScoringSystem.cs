@@ -24,8 +24,33 @@ public static class ScoringSystem
         return -1;
     }
 
-    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts, int modId)
+    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts, int modId, string[] expertPrefs)
     {
+        for (int i = 0; i < 6; i++)
+        {
+            var modifier = 0;
+            var contained = new[] { "Easy", "Medium", "Hard", "VeryHard" };
+            var difficulties = virtualBomb.Select(x => x.ExpertDifficulty).ToArray();
+
+            switch (expertPrefs[i])
+            {
+                case "Easy":
+                    modifier = difficulties.Count(x => "Easy".Equals(x));
+                    break;
+                case "Medium":
+                    modifier = 2 * difficulties.Count(x => "Medium".Equals(x));
+                    break;
+                case "Hard":
+                    modifier = 3 * difficulties.Count(x => "Hard".Equals(x));
+                    break;
+                case "VeryHard":
+                    modifier = 4 * difficulties.Count(x => "VeryHard".Equals(x));
+                    break;
+            }
+
+            bases[i] += modifier;
+        }
+
         for (int i = 0; i < 6; i++)
         {
             int modifier = 0;
