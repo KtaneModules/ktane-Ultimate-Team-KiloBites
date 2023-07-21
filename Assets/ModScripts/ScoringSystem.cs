@@ -24,7 +24,7 @@ public static class ScoringSystem
         return -1;
     }
 
-    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts)
+    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts, int modId)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -151,7 +151,7 @@ public static class ScoringSystem
                     break;
                 case 24: // Lulu
                     var lulu = new[] { virtualBomb.Where(x => x.Name.Contains("Simon") && x.Name.Contains("Tasha")).Count(), realBomb.Where(x => x.Name.Contains("Simon") && x.Name.Contains("Tasha")).Count() };
-                    var lulu2 = new[] { virtualBomb.Where(x => x.Quirks.Contains("TimeDependent")).Count(), realBomb.Where(x => x.Quirks.Contains("TimeDependent")).Count() };
+                    int[] lulu2 = new[] { virtualBomb.Count(x => x.Quirks != null && x.Quirks.Contains("TimeDependent")), realBomb.Count(x => x.Quirks != null && x.Quirks.Contains("TimeDependent")) };
                     modifier = 2 * lulu.Sum() - 3 * lulu2.Sum();
                     break;
                 case 25: // Mage
@@ -222,11 +222,11 @@ public static class ScoringSystem
                     var timwiSer = UnityEngine.Object.FindObjectOfType<UltimateTeamService>();
 
                     if (timwiSer == null)
-                        Debug.LogFormat("[Ultimate Team #{0}] Cannot find Souvenir supported modules, so not applying Timwi's rule.");
+                        Debug.Log($"[Ultimate Team #{modId}] Cannot find Souvenir supported modules, so not applying Timwi's rule.");
                     else if (timwiSer.connectedJson && timwiSer.connectedSprite)
                     {
-                        modifier = virtualBomb.Where(x => "Supported".Equals(x.Souvenir.Status)).Count();
-                        modifier -= virtualBomb.Where(x => !"Supported".Equals(x.Souvenir.Status)).Count() / 2;
+                        modifier = virtualBomb.Count(x => x.Souvenir != null && "Supported".Equals(x.Souvenir.Status));
+                        modifier -= virtualBomb.Count(x => x.Souvenir != null && !"Supported".Equals(x.Souvenir.Status)) / 2;
                     }
                     break;
                 case 41: // Varunaxx
