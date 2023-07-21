@@ -260,14 +260,10 @@ public class UltimateTeamScript : MonoBehaviour
         var counts = new int[12];
 
         foreach (var item in q2)
-        {
             counts[item]++;
-        }
 
         if (counts.Where(x => x > 2).Count() > 0)
-        {
             goto tryagain;
-        }
         else
         {
             expertProf = q.ToList();
@@ -275,47 +271,34 @@ public class UltimateTeamScript : MonoBehaviour
             {
                 moduleProf.Add(new List<int>());
                 for (int j = 0; j < 6; j++)
-                {
                     if (expertProf[j].Contains(i))
-                    {
                         moduleProf.Last().Add(j);
-                    }
-                }
             }
         }
     }
 
     List<int> genProficiency(List<List<int>> q)
     {
-    tryagain:
+        tryagain:
         var prob = Range(0, 5);
         List<int> ixs = Enumerable.Range(0, 12).Where(x => mods[x] != -1).ToList().Shuffle().Take(prob == 0 ? 1 : prob == 4 ? 3 : 2).ToList();
 
         for (int i = 0; i < q.Count; i++)
-        {
             if (ixs.Count == q[i].Count)
             {
                 var fail = true;
                 for (int j = 0; j < q[i].Count; j++)
-                {
                     if (ixs[j] != q[i][j])
-                    {
                         fail = false;
-                    }
-                }
                 if (fail)
-                {
                     goto tryagain;
-                }
             }
-        }
 
         return ixs;
     }
 
     void displaySprites()
     {
-
         for (int i = 0; i < 6; i++)
         {
             iconRender[i].sprite = icons[bombFlipped ? i + 6 : i];
@@ -323,16 +306,17 @@ public class UltimateTeamScript : MonoBehaviour
             expertNameRends[i].text = currExpertNames[i].ToUpperInvariant();
 
             for (int j = 0; j < 2; j++)
-            {
                 renders[i][j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
-                
-            }
-            for (int j = 0; j < moduleProf[i].Count; j++)
+            for (int j = 0; j < moduleProf[bombFlipped ? i + 6 : i].Count; j++)
             {
-                Log(i.ToString() + " " + j.ToString() + " ");
-                renders[i][j].sprite = profilePictures[moduleProf[bombFlipped ? i + 6 : i][j]];
+                Log(i.ToString() + " " + j.ToString() + " " + moduleProf.Select(x => x.Join(", ")).Join(" | "));
+                renders[i][j].sprite = profilePictures[experts[moduleProf[bombFlipped ? i + 6 : i][j]]];
             }
         }
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 2; j++)
+                if (renders[i][j].sprite.name == "!placeholder")
+                    renders[i][j].enabled = false;
     }
 
     void calculations()
