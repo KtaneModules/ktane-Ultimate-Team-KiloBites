@@ -39,14 +39,14 @@ public class UltimateTeamScript : MonoBehaviour
 
     private KMAudio.KMAudioRef Sound;
     private Coroutine mainButtonsAnimCoroutine;
-    private static List<KtaneModule> allMods;
+    private List<KtaneModule> allMods;
     private List<KtaneModule> virtualBomb = new List<KtaneModule>();
     private List<KtaneModule> realBomb = new List<KtaneModule>();
     private string[] moduleNames = new string[12];
     private List<string> expertDifficulties = new List<string>();
     private List<List<int>> expertProf = new List<List<int>>();
     private List<List<int>> moduleProf = new List<List<int>>();
-    private static Texture spriteSheet;
+    private Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
     private List<int> experts = new List<int>();
     private List<int> team = new List<int>();
