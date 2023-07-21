@@ -213,9 +213,9 @@ public class UltimateTeamScript : MonoBehaviour
                 var types = new[] { "FullBoss", "Needy", "Widget" };
 
                 if (bossIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].BossStatus)).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].BossStatus) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
                 else if (needyIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[1].Equals(allMods[x].Type)).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
                 else
                     mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
 
