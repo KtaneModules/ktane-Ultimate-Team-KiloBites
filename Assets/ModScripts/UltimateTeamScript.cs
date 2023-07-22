@@ -256,7 +256,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     void assignProficiencies()
     {
-    tryagain:
+        tryagain:
         var q = new List<List<int>>();
         var q2 = new List<int>();
 
@@ -288,7 +288,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     List<int> genProficiency(List<List<int>> q)
     {
-    tryagain:
+        tryagain:
         var prob = Range(0, 5);
         List<int> ixs = Enumerable.Range(0, 12).Where(x => mods[x] != -1).ToList().Shuffle().Take(prob == 0 ? 1 : prob == 4 ? 3 : 2).ToList();
 
@@ -432,6 +432,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     private IEnumerator switchMenu(float duration = 0.15f)
     {
+        cannotPress = true;
         float timer = 0;
         while (timer < duration)
         {
@@ -444,6 +445,7 @@ public class UltimateTeamScript : MonoBehaviour
         expertCards[0].transform.parent.localPosition = new Vector3(!rightMenu ? 0.2f : 0, 0, 0);
         bombCasing.transform.parent.localPosition = new Vector3(!rightMenu ? 0 : -0.2f, 0, 0);
         surface.material.SetTextureOffset("_MainTex", new Vector2(rightMenu ? 0.1f : 0, 0));
+        cannotPress = false;
     }
 
     private IEnumerator LEDFlash(float interval = 0.5f)
@@ -479,17 +481,93 @@ public class UltimateTeamScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} something";
+    private readonly string TwitchHelpMessage = @"Use '!{0} switch' to change menus. Use '!{0} flip' to flip the virtual bomb on the Mission menu, and use '!{0} submit 1 3' to select the first and third experts in reading order in the Experts menu (and deselect any others), then press the status light.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-        yield return null;
+        command = command.ToLowerInvariant();
+        string[] commandArray = command.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        if (commandArray.Length == 0)
+        {
+            yield return "sendtochaterror Invalid command.";
+            yield break;
+        }
+        if (command == "switch")
+        {
+            yield return null;
+            mainButtons[rightMenu ? 0 : 1].OnInteract();
+        }
+        else if (command == "flip" && !rightMenu)
+        {
+            yield return null;
+            flipBombButton.OnInteract();
+        }
+        else if (command == "flip")
+        {
+            yield return "sendtochaterror You can't use that command in the Experts menu!";
+            yield break;
+        }
+        else if (commandArray.First() == "submit" && rightMenu)
+        {
+            if (commandArray.Length > 1 && commandArray.Length < 4)
+            {
+                for (int i = 0; i < commandArray.Length - 1; i++)
+                {
+                    int thing = 0;
+                    if (!int.TryParse(commandArray[i + 1], out thing) || int.Parse(commandArray[i + 1]) < 1 || int.Parse(commandArray[i + 1]) > 6)
+                    {
+                        yield return "sendtochaterror I can't select " + (commandArray.Length == 2 ? "that expert!" : "those experts!");
+                        yield break;
+                    }
+                }
+                List<int> chosen = new List<int>();
+                for (int i = 0; i < commandArray.Length - 1; i++)
+                    chosen.Add(int.Parse(commandArray[i + 1]) - 1);
+                yield return null;
+                for (int i = 0; i < 6; i++)
+                    if (chosen.Contains(i) != selected[i])
+                    {
+                        expertCards[i].OnInteract();
+                        float timer = 0;
+                        while (timer < 0.1f)
+                        {
+                            yield return null;
+                            timer += Time.deltaTime;
+                        }
+                    }
+                statusLightButton.OnInteract();
+            }
+            else
+            {
+                yield return "sendtochaterror I can't select those experts!";
+                yield break;
+            }
+        }
+        else if (commandArray.First() == "submit")
+        {
+            yield return "sendtochaterror You can't use that command in the Mission menu!";
+            yield break;
+        }
+        else
+        {
+            yield return "sendtochaterror Invalid command.";
+            yield break;
+        }
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        yield return null;
+        while (cannotPress)
+            yield return true;
+        if (!rightMenu)
+            mainButtons[1].OnInteract();
+        while (cannotPress)
+            yield return true;
+        for (int i = 0; i < 6; i++)
+            if (selected[i] != team.Contains(i))
+                expertCards[i].OnInteract();
+        yield return true;
+        statusLightButton.OnInteract();
     }
 }
