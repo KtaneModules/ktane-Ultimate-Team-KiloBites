@@ -107,6 +107,20 @@ public class UltimateTeamScript : MonoBehaviour
                 }
                 else
                 {
+                    var strikeExperts = new List<string>();
+
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if (selected[i])
+                        {
+                            strikeExperts.Add(currExpertNames[i]);
+                        }
+                    }
+
+                    var strikeMessage = strikeExperts.Count > 0 ? $"{strikeExperts.PickRandom()} has been selected and decided to strike on {moduleNames.Where(x => !"[TIMER]".Equals(x)).PickRandom()}, striking out the bomb entirely." : "You have selected nobody for this bomb, therefore blowing up the bomb as a result.";
+
+                    Log($"[Ultimate Team #{moduleId}] {strikeMessage} Strike!");
+
                     Module.HandleStrike();
                 }
             }
@@ -156,7 +170,7 @@ public class UltimateTeamScript : MonoBehaviour
             StartCoroutine(LEDFlash());
         cannotPress = false;
 
-        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 7/21/23.";
+        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 7/22/23.";
 
         Log($"[Ultimate Team #{moduleId}] {connected}");
 
@@ -350,10 +364,11 @@ public class UltimateTeamScript : MonoBehaviour
         Log($"[Ultimate Team #{moduleId}] After calculating each score by difficulties present on the virtual bomb and applying conditions for each expert in reading order: {scores.Join(", ")}");
         team = Enumerable.Range(0, 6).ToList();
         team = team.Select((x, ix) => new { x, ix }).OrderByDescending(x => scores[x.ix]).Select(x => x.x).ToList();
-        if (expertDifficulties.Count(x => x == "VeryEasy") >= 4)
+        if (expertDifficulties.Count(x => "VeryEasy".Equals(x)) >= 4 || team.Any(x => x == 66669420))
         {
+            var log = team.Any(x => x == 66669420) ? "CyanixDash is your only expert since the firstmost condition applied. Don't take anyone else." : "Since there are at least 4 Very Easy modules on the virtual bomb, you'll be taking only one expert.";
             team = team.Take(1).ToList();
-            Log($"[Ultimate Team #{moduleId}] Since there are at least 4 Very Easy modules on the virtual bomb, you'll be taking only one expert.");
+            Log($"[Ultimate Team #{moduleId}] {log}");
         }
         else
         {
@@ -366,6 +381,7 @@ public class UltimateTeamScript : MonoBehaviour
 
     private IEnumerator solve()
     {
+        Log($"[Ultimate Team #{moduleId}] You have selected the correct expert(s). Solved!");
         moduleSolved = true;
         Module.HandlePass();
         stamp.transform.localScale = Vector3.one;
