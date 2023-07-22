@@ -210,14 +210,16 @@ public class UltimateTeamScript : MonoBehaviour
             }
             else
             {
-                var types = new[] { "FullBoss", "Needy", "Widget" };
+                var types = new[] { "Needy", "Widget" };
+
+                var bossTypes = new[] { "FullBoss", "SemiBoss" };
 
                 if (bossIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].BossStatus) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => bossTypes[0].Equals(allMods[x].BossStatus) || bossTypes[1].Equals(allMods[x].BossStatus) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
                 else if (needyIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
                 else
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !types[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && !types[2].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !bossTypes[0].Equals(allMods[x].BossStatus) && !bossTypes[0].Equals(allMods[x].BossStatus) && !types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
 
                 KtaneModule usedMod = allMods[mods[i]];
                 virtualBomb.Add(usedMod);
@@ -334,12 +336,20 @@ public class UltimateTeamScript : MonoBehaviour
         var scores = ScoringSystem.baseScores(Bomb.GetSerialNumber());
         Log($"[Ultimate Team #{moduleId}] The assigned scores for the experts in reading order: {scores.Join(", ")}");
 
+        var ixes = new[] { "Easy", "Medium", "Hard", "VeryHard" };
+
         for (int i = 0; i < 6; i++)
-            scores[i] += expertDifficulties.Where(x => x == currExpertPrefDiffs[i]).Count();
+        {
+            scores[i] += expertDifficulties.Count(x => currExpertPrefDiffs[i].Equals(x)) * (Array.IndexOf(ixes, currExpertPrefDiffs[i]) + 1);
+
+        }
+
+
+        Log($"[Ultimate Team #{moduleId}] After adding proficiency scores for each expert in reading order: {scores.Join(", ")}");
         scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray(), moduleId, expertPreferredDiffs);
-        Log($"[Ultimate Team #{moduleId}] After calculating each score by difficulties present on the virtual bomb and applying conditions for each expert: {scores.Join(", ")}");
+        Log($"[Ultimate Team #{moduleId}] After calculating each score by difficulties present on the virtual bomb and applying conditions for each expert in reading order: {scores.Join(", ")}");
         team = Enumerable.Range(0, 6).ToList();
-        team = team.Select((x, ix) => new { x, ix }).OrderBy(x => scores[x.ix]).Select(x => x.x).ToList();
+        team = team.Select((x, ix) => new { x, ix }).OrderByDescending(x => scores[x.ix]).Select(x => x.x).ToList();
         if (expertDifficulties.Count(x => x == "VeryEasy") >= 4)
         {
             team = team.Take(1).ToList();
