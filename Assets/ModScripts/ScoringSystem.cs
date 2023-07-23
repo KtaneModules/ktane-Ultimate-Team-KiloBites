@@ -231,7 +231,7 @@ public static class ScoringSystem
                     modifier = bomb.GetSerialNumberLetters().Any(x => "WI".Contains(x)) || realBomb.Any(x => "Simon Sends".Equals(x)) ? 3 : -2;
                     break;
                 case 43: // xorote
-                    modifier = virtualBomb.Any(x => x.Author.Contains("SpeakingEvil")) || realBomb.Any(x => x.Author.Contains("SpeakingEvil")) ? 4 : -1;
+                    modifier = virtualBomb.Any(x => x.Author.Equals("Speakingevil")) || realBomb.Any(x => x.Author.Equals("Speakingevil")) ? 4 : -1;
                     break;
                 case 44: // Zaakeil
                     modifier = 5 - (bomb.GetBatteryCount() + bomb.GetPortCount());
