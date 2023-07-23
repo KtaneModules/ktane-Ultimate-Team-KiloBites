@@ -219,15 +219,7 @@ public static class ScoringSystem
                         bomb.GetBatteryCount() == 0 ? 4 : -1;
                     break;
                 case 40: // Timwi
-                    var timwiSer = UnityEngine.Object.FindObjectOfType<UltimateTeamService>();
-
-                    if (timwiSer == null)
-                        Debug.Log($"[Ultimate Team #{modId}] Cannot find Souvenir supported modules, so not applying Timwi's rule.");
-                    else if (timwiSer.connectedJson && timwiSer.connectedSprite)
-                    {
-                        modifier = virtualBomb.Count(x => x.Souvenir != null && "Supported".Equals(x.Souvenir.Status));
-                        modifier -= virtualBomb.Count(x => x.Souvenir != null && !"Supported".Equals(x.Souvenir.Status)) / 2;
-                    }
+                    modifier = bomb.GetSerialNumberNumbers().Any(x => x == 4 && x == 7) ? 5 : bomb.GetSerialNumberNumbers().Any(x => x == 4 || x == 7) ? 3 : -1;
                     break;
                 case 41: // Varunaxx
                     if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
