@@ -175,7 +175,7 @@ public static class ScoringSystem
                     modifier = virtualBomb.Where(x => x.Name.StartsWith("The")).Count() - virtualBomb.Where(x => !x.Name.StartsWith("The")).Count() / 2;
                     break;
                 case 30: // Obvious
-                    if (virtualBomb.Any(x => "Yoshi Egg".Equals(x.Name)) || realBomb.Any(x => "Yoshi Egg".Equals(x.Name.Contains("Simon"))))
+                    if (virtualBomb.Any(x => "Yoshi Egg".Equals(x.Name)) || realBomb.Any(x => "Yoshi Egg".Equals(x.Name)))
                         bases[i] = 0;
                     else
                         modifier = virtualBomb.Where(x => "Obvious".Equals(x.Author)).Count();
