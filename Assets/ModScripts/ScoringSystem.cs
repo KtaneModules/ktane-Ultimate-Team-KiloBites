@@ -132,7 +132,7 @@ public static class ScoringSystem
                         modifier = virtualBomb.Any(x => "Unfair's Revenge".Equals(x.Name)) || realBomb.Any(x => "Unfair's Revenge".Equals(x.Name)) ? 5 : 1;
                     break;
                 case 19: // Konoko
-                    modifier = virtualBomb.Where(x => Regex.IsMatch(x.Name, "^[A-Za-z]{6}")).Count() > 0 ? 4 : -1;
+                    modifier = virtualBomb.Any(x => Regex.IsMatch(x.Name, "^[A-Za-z]{6}$")) ? 4 : -1;
                     break;
                 case 20: // Kugel
                     modifier = bomb.GetBatteryCount() >= 6 ? -3 : bomb.GetBatteryCount();
@@ -172,7 +172,8 @@ public static class ScoringSystem
                         modifier = 1;
                     break;
                 case 29: // NShep
-                    modifier = virtualBomb.Where(x => x.Name.StartsWith("The")).Count() - virtualBomb.Where(x => !x.Name.StartsWith("The")).Count() / 2;
+                    var shep = "RPSJ";
+                    modifier = virtualBomb.Count(x => shep.Contains(x.Name[0])) - virtualBomb.Count(x => !shep.Contains(x.Name[0])) / 2;
                     break;
                 case 30: // Obvious
                     if (virtualBomb.Any(x => "Yoshi Egg".Equals(x.Name)) || realBomb.Any(x => "Yoshi Egg".Equals(x.Name)))
@@ -203,7 +204,7 @@ public static class ScoringSystem
                     break;
                 case 37: // Sierra
                     var sierraColors = new[] { "Green", "Blue", "Brown", "Purple", "Orange", "Black", "White" };
-                    if (virtualBomb.Any(x => sierraColors.Where(y => x.Name.ToLower().Contains(y)).Count() > 0) || realBomb.Any(x => sierraColors.Where(y => x.Name.ToLower().Contains(y)).Count() > 0))
+                    if (virtualBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))) || realBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))))
                         modifier = 5;
                     else if (bomb.GetSerialNumberLetters().Any(x => x == 'S'))
                         modifier = -1;
