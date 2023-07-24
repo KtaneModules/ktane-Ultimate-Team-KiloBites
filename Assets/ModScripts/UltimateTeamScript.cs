@@ -353,15 +353,16 @@ public class UltimateTeamScript : MonoBehaviour
         var ixes = new[] { "Easy", "Medium", "Hard", "VeryHard" };
 
         for (int i = 0; i < 6; i++)
-        {
-            scores[i] += expertDifficulties.Count(x => currExpertPrefDiffs[i].Equals(x)) * (Array.IndexOf(ixes, currExpertPrefDiffs[i]) + 1);
-
-        }
-
-
+            for (int j = 0; j < expertProf[i].Count(); j++)
+                scores[i] += Array.IndexOf(ixes, expertDifficulties[expertProf[i][j]]) + 1;
         Log($"[Ultimate Team #{moduleId}] After adding proficiency scores for each expert in reading order: {scores.Join(", ")}");
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < expertDifficulties.Count(); j++)
+                if (expertDifficulties[j] == currExpertPrefDiffs[i])
+                    scores[i]++;
+        Log($"[Ultimate Team #{moduleId}] After adding preferred difficulty scores: {scores.Join(", ")}");
         scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray(), moduleId, expertPreferredDiffs);
-        Log($"[Ultimate Team #{moduleId}] After calculating each score by difficulties present on the virtual bomb and applying conditions for each expert in reading order: {scores.Join(", ")}");
+        Log($"[Ultimate Team #{moduleId}] Final scores: {scores.Join(", ")}");
         team = Enumerable.Range(0, 6).ToList();
         team = team.Select((x, ix) => new { x, ix }).OrderByDescending(x => scores[x.ix]).Select(x => x.x).ToList();
         if (expertDifficulties.Count(x => "VeryEasy".Equals(x)) >= 4 || team.Any(x => x == 66669420))
@@ -373,7 +374,7 @@ public class UltimateTeamScript : MonoBehaviour
         else
         {
             team = team.Take(2).ToList();
-            Log($"[Ultimate Team #{moduleId}] Since there are less Very Easy modules on the virtual bomb, you'll be taking two experts.");
+            Log($"[Ultimate Team #{moduleId}] Since there are less than 4 Very Easy modules on the virtual bomb, you'll be taking two experts.");
         }
         var resultFormat = team.Count == 1 ? $"According to the highest score, you should take {currExpertNames[team[0]]}." : $"According to the two highest scores, you should take {currExpertNames[team[0]]} and {currExpertNames[team[1]]}.";
         Log($"[Ultimate Team #{moduleId}] {resultFormat}");
