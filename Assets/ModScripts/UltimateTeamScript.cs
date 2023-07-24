@@ -233,7 +233,7 @@ public class UltimateTeamScript : MonoBehaviour
                 else if (needyIx[i])
                     mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
                 else
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => x != mods[i] && !bossTypes[0].Equals(allMods[x].BossStatus) && !bossTypes[1].Equals(allMods[x].BossStatus) && !types[0].Equals(allMods[x].Type) && !types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
+                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => mods.Any(mod => mod != x) && !bossTypes[0].Equals(allMods[x].BossStatus) && !bossTypes[1].Equals(allMods[x].BossStatus) && !types[0].Equals(allMods[x].Type) && !types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
 
                 KtaneModule usedMod = allMods[mods[i]];
                 virtualBomb.Add(usedMod);
