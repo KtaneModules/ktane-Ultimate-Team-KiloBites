@@ -203,7 +203,7 @@ public static class ScoringSystem
                     modifier = realBomb.Count() >= 47 ? 4 : -1;
                     break;
                 case 37: // Sierra
-                    var sierraColors = new[] { "Green", "Blue", "Brown", "Purple", "Orange", "Black", "White" };
+                    var sierraColors = new[] { "green", "blue", "brown", "purple", "orange", "black", "white" };
                     if (virtualBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))) || realBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))))
                         modifier = 5;
                     else if (bomb.GetSerialNumberLetters().Any(x => x == 'S'))
