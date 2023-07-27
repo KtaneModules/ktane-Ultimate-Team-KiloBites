@@ -298,6 +298,7 @@ public class UltimateTeamScript : MonoBehaviour
                         moduleProf.Last().Add(j);
             }
         }
+        Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows, starting from {(moduleNames[0] == "[TIMER]" ? "the timer" : moduleNames[0])}: {moduleProf.Select((x, ix) => moduleNames[ix] + " — " + (x.Count() == 0 ? "none" : x.Select(y => currExpertNames[y]).Join(" | "))).Join(", ")}.");
     }
 
     List<int> genProficiency(List<List<int>> q)
