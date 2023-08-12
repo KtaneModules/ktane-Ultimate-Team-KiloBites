@@ -62,7 +62,7 @@ public class UltimateTeamScript : MonoBehaviour
     private Image[][] renders;
 
     private static readonly string[] expertNames = { "1254", "AlexCorruptor", "Axo", "BigCrunch22", "Cinnabar", "Crazycaleb", "CyanixDash", "Danielstigman", "dicey", "Diffuse", "diskoQs", "Espik", "eXish", "Floofy Floofles", "GhostSalt", "GoodHood", "Gwen", "JyGein", "Kilo", "Konoko", "Kugel", "Kuro", "Lexa", "LilyFlair", "Lulu", "Mage", "Marksam", "MasQuéÉlite", "meh", "NShep", "Obvious", "Piissii", "Quinn Wuest", "redpenguin", "Rosenothorns03", "Scoping Landscape", "Setra", "Sierra", "tandyCake", "TheFullestCircle", "Timwi", "Varunaxx", "WitekWitek", "xorote", "Zaakeil", "Zaphod" };
-    private static readonly string[] expertPreferredDiffs = { "Easy", "Easy", "Medium", "Hard", "Medium", "VeryHard", "Easy", "VeryHard", "Hard", "Medium", "Easy", "VeryHard", "VeryHard", "Easy", "Medium", "Easy", "Easy", "Easy", "Hard", "Medium", "Hard", "Easy", "Medium", "Easy", "Medium", "Medium", "VeryHard", "Medium", "Hard", "Hard", "VeryHard", "VeryHard", "Hard", "Hard", "Medium", "VeryHard", "Medium", "Easy", "Hard", "Easy", "Hard", "Hard", "Medium", "VeryHard", "VeryHard", "VeryHard" };
+    private static readonly string[] expertPreferredDiffs = { "Easy", "Easy", "Medium", "Hard", "Medium", "VeryHard/Extreme", "Easy", "VeryHard/Extreme", "Hard", "Medium", "Easy", "VeryHard/Extreme", "VeryHard/Extreme", "Easy", "Medium", "Easy", "Easy", "Easy", "Hard", "Medium", "Hard", "Easy", "Medium", "Easy", "Medium", "Medium", "VeryHard/Extreme", "Medium", "Hard", "Hard", "VeryHard/Extreme", "VeryHard/Extreme", "Hard", "Hard", "Medium", "VeryHard/Extreme", "Medium", "Easy", "Hard", "Easy", "Hard", "Hard", "Medium", "VeryHard/Extreme", "VeryHard/Extreme", "VeryHard/Extreme" };
 
     void Awake()
     {
@@ -170,7 +170,7 @@ public class UltimateTeamScript : MonoBehaviour
             StartCoroutine(LEDFlash());
         cannotPress = false;
 
-        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 7/22/23.";
+        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 8/12/23.";
 
         Log($"[Ultimate Team #{moduleId}] {connected}");
 
@@ -261,7 +261,7 @@ public class UltimateTeamScript : MonoBehaviour
         }
 
         Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
-        Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard", "Very Hard")}");
+        Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard")}");
 
         assignProficiencies();
         displaySprites();
@@ -332,7 +332,7 @@ public class UltimateTeamScript : MonoBehaviour
             for (int j = 0; j < 2; j++)
             {
                 renders[i][j].sprite = placeholder;
-                renders[i][j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
+                renders[i][j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "Trivial" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
             }
 
             for (int j = 0; j < moduleProf[bombFlipped ? i + 6 : i].Count; j++)
@@ -355,27 +355,27 @@ public class UltimateTeamScript : MonoBehaviour
 
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < expertProf[i].Count(); j++)
-                scores[i] += Array.IndexOf(ixes, expertDifficulties[expertProf[i][j]]) + 1;
+                scores[i] += "Extreme".Equals(expertDifficulties[expertProf[i][j]]) ? 4 : Array.IndexOf(ixes, expertDifficulties[expertProf[i][j]]) + 1;
         Log($"[Ultimate Team #{moduleId}] After adding proficiency scores for each expert in reading order: {scores.Join(", ")}");
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < expertDifficulties.Count(); j++)
-                if (expertDifficulties[j] == currExpertPrefDiffs[i])
+                if (expertDifficulties[j] == currExpertPrefDiffs[i] || "Extreme".Equals(expertDifficulties[j]) && "Extreme".Contains(currExpertPrefDiffs[i]))
                     scores[i]++;
         Log($"[Ultimate Team #{moduleId}] After adding preferred difficulty scores: {scores.Join(", ")}");
-        scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray(), moduleId, expertPreferredDiffs);
+        scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray());
         Log($"[Ultimate Team #{moduleId}] Final scores: {scores.Join(", ")}");
         team = Enumerable.Range(0, 6).ToList();
         team = team.Select((x, ix) => new { x, ix }).OrderByDescending(x => scores[x.ix]).Select(x => x.x).ToList();
-        if (expertDifficulties.Count(x => "VeryEasy".Equals(x)) >= 4 || team.Any(x => x == 66669420))
+        if (expertDifficulties.Count(x => "VeryEasy".Equals(x) || "Trivial".Equals(x)) >= 4 || team.Any(x => x == 66669420))
         {
-            var log = team.Any(x => x == 66669420) ? "CyanixDash is your only expert since the firstmost condition applied. Don't take anyone else." : "Since there are at least 4 Very Easy modules on the virtual bomb, you'll be taking only one expert.";
+            var log = team.Any(x => x == 66669420) ? "CyanixDash is your only expert since the firstmost condition applied. Don't take anyone else." : "Since there are at least 4 Very Easy/Trivial modules on the virtual bomb, you'll be taking only one expert.";
             team = team.Take(1).ToList();
             Log($"[Ultimate Team #{moduleId}] {log}");
         }
         else
         {
             team = team.Take(2).ToList();
-            Log($"[Ultimate Team #{moduleId}] Since there are less than 4 Very Easy modules on the virtual bomb, you'll be taking two experts.");
+            Log($"[Ultimate Team #{moduleId}] Since there are less than 4 Very Easy/Trivial modules on the virtual bomb, you'll be taking two experts.");
         }
         var resultFormat = team.Count == 1 ? $"According to the highest score, you should take {currExpertNames[team[0]]}." : $"According to the two highest scores, you should take {currExpertNames[team[0]]} and {currExpertNames[team[1]]}.";
         Log($"[Ultimate Team #{moduleId}] {resultFormat}");

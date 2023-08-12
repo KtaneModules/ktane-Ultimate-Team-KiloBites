@@ -24,7 +24,7 @@ public static class ScoringSystem
         return -1;
     }
 
-    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts, int modId, string[] expertPrefs)
+    public static int[] modifyingScores(KMBombInfo bomb, List<KtaneModule> virtualBomb, List<KtaneModule> realBomb, int[] bases, int[] experts)
     {
         for (int i = 0; i < 6; i++)
         {
