@@ -36,30 +36,30 @@ public static class ScoringSystem
                     modifier = oneTwo.Contains(digitalRoot(bomb.GetSerialNumberNumbers().ToArray())) ? 3 : -1;
                     break;
                 case 1: // AlexCorruptor
-                    modifier = virtualBomb.All(x => x.Name.ToLower().Any(y => "tepig".Contains(y))) ? 3 : -1;
+                    modifier = virtualBomb.All(mod => mod == null || mod.Name.ToLowerInvariant().Any("tepig".Contains)) ? 3 : -1;
                     break;
                 case 2: // Axo
-                    if (virtualBomb.Any(x => "XO".Equals(x.Name)) || realBomb.Any(x => "XO".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "XO") || realBomb.Any(mod => mod.Name == "XO"))
                         bases[i] = 0;
                     else
-                        modifier = bomb.GetSerialNumberLetters().Any(x => "AXO".Contains(x)) ? 3 : -1;
+                        modifier = bomb.GetSerialNumberLetters().Any("AXO".Contains) ? 3 : -1;
                     break;
                 case 3: // BigCrunch22
                     var crunch = new[] { bomb.GetBatteryHolderCount() == 2, bomb.GetIndicators().Count() == 2, bomb.GetPortPlateCount() == 2 };
                     for (int j = 0; j < crunch.Length; j++)
                         if (crunch[j])
                             modifier += 2;
-                    if (bomb.GetSerialNumberNumbers().Any(x => x != 2))
+                    if (bomb.GetSerialNumberNumbers().Any(num => num != 2))
                         modifier -= 2;
                     break;
                 case 4: // Cinnabar
                     modifier = bomb.GetOnIndicators().Count() >= 3 ? -3 : 2 * bomb.GetOnIndicators().Count();
                     break;
                 case 5: // CrazyCaleb
-                    if (virtualBomb.Any(x => "Bartending".Equals(x.Name)) || realBomb.Any(x => "Bartending".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "Bartending") || realBomb.Any(mod => mod.Name == "Bartending"))
                         bases[i] = 0;
                     else
-                        modifier = bomb.GetSerialNumberLetters().Any(x => "AEIOU".Contains(x)) ? 3 : -1;
+                        modifier = bomb.GetSerialNumberLetters().Any("AEIOU".Contains) ? 3 : -1;
                     break;
                 case 6: // CyanixDash
                     if (bomb.IsIndicatorOn(Indicator.CLR) && bomb.GetBatteryCount() == 3)
@@ -71,7 +71,9 @@ public static class ScoringSystem
                     }
                     break;
                 case 7: // Danielstigman
-                    var dan = new[] { virtualBomb.Where(x => "VeryEasy".Equals(x.ExpertDifficulty)).Count(), virtualBomb.Where(x => "Easy".Equals(x.ExpertDifficulty)).Count(), virtualBomb.Where(x => "Medium".Equals(x.ExpertDifficulty)).Count(), virtualBomb.Where(x => "Hard".Equals(x.ExpertDifficulty)).Count(), virtualBomb.Where(x => "VeryHard".Equals(x.ExpertDifficulty)).Count() };
+                    var dan = new[] { "VeryEasy", "Easy", "Medium", "Hard", "VeryHard" }
+                        .Select(difficulty => virtualBomb.Count(mod => mod?.ExpertDifficulty == difficulty))
+                        .ToArray();
                     int mostCommon = 0;
                     for (int j = 1; j < 5; j++)
                         if (dan[j] >= dan[mostCommon])
@@ -85,7 +87,8 @@ public static class ScoringSystem
                     modifier = Array.IndexOf(experts, experts[i]) == 5 ? -5 : Array.IndexOf(experts, experts[i]) + 1;
                     break;
                 case 9: // Diffuse
-                    modifier = virtualBomb.Any(x => "Unfair's Cruel Revenge".Equals(x.Name) || x.Name.ToLower().Contains("Cipher")) || realBomb.Any(x => "Unfair's Cruel Revenge".Equals(x.Name) || x.Name.ToLower().Contains("Cipher")) ? 5 : -1;
+                    modifier = virtualBomb.Any(mod => mod != null && (mod.Name == "Unfair's Cruel Revenge" || mod.Name.ContainsIgnoreCase("Cipher")))
+                        || realBomb.Any(mod => mod.Name == "Unfair's Cruel Revenge" || mod.Name.ContainsIgnoreCase("Cipher")) ? 5 : -1;
                     break;
                 case 10: // diskoQs
                     if (bomb.GetOnIndicators().Count() > bomb.GetOffIndicators().Count())
@@ -94,7 +97,7 @@ public static class ScoringSystem
                         modifier = -2;
                     break;
                 case 11: // Espik
-                    if (virtualBomb.Any(x => "Forget Me Now".Equals(x.Name)) || realBomb.Any(x => "Forget Me Now".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "Forget Me Now") || realBomb.Any(mod => mod.Name == "Forget Me Now"))
                         bases[i] = 0;
                     else
                         modifier = !bomb.IsPortPresent(Port.Parallel) || !bomb.IsPortPresent(Port.Serial) ? 3 : -1;
@@ -112,12 +115,12 @@ public static class ScoringSystem
                         modifier = -2;
                     break;
                 case 14: // GhostSalt
-                    if(virtualBomb.Where(x => "Needy".Equals(x.Type)).Select(x => x.Name).Count() + realBomb.Where(x => "Needy".Equals(x.Type)).Select(x => x.Name).Count() > 0)
+                    if (virtualBomb.Count(mod => mod?.Type == "Needy") + realBomb.Count(mod => mod.Type == "Needy") > 0)
                         modifier = 3;
                     modifier += bomb.GetOffIndicators().Count() - bomb.GetOnIndicators().Count();
                     break;
                 case 15: // GoodHood
-                    modifier = virtualBomb.Where(x => "VeryEasy".Equals(x.ExpertDifficulty)).Count() - virtualBomb.Where(x => "VeryHard".Equals(x.ExpertDifficulty)).Count() / 2;
+                    modifier = virtualBomb.Count(mod => mod?.ExpertDifficulty == "VeryEasy") - virtualBomb.Count(mod => mod?.ExpertDifficulty == "VeryHard") / 2;
                     break;
                 case 16: // Gwen
                     modifier = bomb.GetSerialNumberNumbers().Count() % 2 != 0 ? 4 : -1;
@@ -129,16 +132,16 @@ public static class ScoringSystem
                     if (DateTime.Now.DayOfWeek == DayOfWeek.Friday || DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
                         bases[i] = 0;
                     else
-                        modifier = virtualBomb.Any(x => "Unfair's Revenge".Equals(x.Name)) || realBomb.Any(x => "Unfair's Revenge".Equals(x.Name)) ? 5 : 1;
+                        modifier = virtualBomb.Any(mod => mod?.Name == "Unfair's Revenge") || realBomb.Any(mod => mod.Name == "Unfair's Revenge") ? 5 : 1;
                     break;
                 case 19: // Konoko
-                    modifier = virtualBomb.Any(x => Regex.IsMatch(x.Name, "^[A-Za-z]{6}$")) ? 4 : -1;
+                    modifier = virtualBomb.Any(mod => mod != null && Regex.IsMatch(mod.Name, "^[A-Za-z]{6}$")) ? 4 : -1;
                     break;
                 case 20: // Kugel
                     modifier = bomb.GetBatteryCount() >= 6 ? -3 : bomb.GetBatteryCount();
                     break;
                 case 21: // Kuro
-                    if (virtualBomb.Any(x => "Procedural Maze".Equals(x.Name)) || realBomb.Any(x => "Procedural Maze".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "Procedural Maze") || realBomb.Any(x => x.Name == "Procedural Maze"))
                         bases[i] = 0;
                     else
                         modifier = bomb.GetPortCount(Port.Parallel) + bomb.GetPortCount(Port.Serial) - 1;
@@ -147,11 +150,11 @@ public static class ScoringSystem
                     modifier = bomb.GetPortPlates().Any(x => x.Length == 0) ? 4 : -2;
                     break;
                 case 23: // LilyFlair
-                    modifier = virtualBomb.Any(x => "Needy".Equals(x.Type)) ? 4 : -2;
+                    modifier = virtualBomb.Any(mod => mod?.Type == "Needy") ? 4 : -2;
                     break;
                 case 24: // Lulu
-                    var lulu = new[] { virtualBomb.Where(x => x.Name.Contains("Simon") && x.Name.Contains("Tasha")).Count(), realBomb.Where(x => x.Name.Contains("Simon") && x.Name.Contains("Tasha")).Count() };
-                    int[] lulu2 = new[] { virtualBomb.Count(x => x.Quirks != null && x.Quirks.Contains("TimeDependent")), realBomb.Count(x => x.Quirks != null && x.Quirks.Contains("TimeDependent")) };
+                    var lulu = new[] { virtualBomb.Count(mod => mod != null && (mod.Name.Contains("Simon") || mod.Name.Contains("Tasha"))), realBomb.Count(mod => mod.Name.Contains("Simon") || mod.Name.Contains("Tasha")) };
+                    int[] lulu2 = new[] { virtualBomb.Count(mod => mod != null && mod.Quirks != null && mod.Quirks.Contains("TimeDependent")), realBomb.Count(mod => mod.Quirks != null && mod.Quirks.Contains("TimeDependent")) };
                     modifier = 2 * lulu.Sum() - 3 * lulu2.Sum();
                     break;
                 case 25: // Mage
@@ -172,14 +175,13 @@ public static class ScoringSystem
                         modifier = 1;
                     break;
                 case 29: // NShep
-                    var shep = "RPSJ";
-                    modifier = virtualBomb.Count(x => shep.Contains(x.Name[0])) - virtualBomb.Count(x => !shep.Contains(x.Name[0])) / 2;
+                    modifier = virtualBomb.Count(mod => mod != null && "RPSJ".Contains(mod.Name[0])) - virtualBomb.Count(mod => mod != null && !"RPSJ".Contains(mod.Name[0])) / 2;
                     break;
                 case 30: // Obvious
-                    if (virtualBomb.Any(x => "Yoshi Egg".Equals(x.Name)) || realBomb.Any(x => "Yoshi Egg".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "Yoshi Egg") || realBomb.Any(x => x.Name == "Yoshi Egg"))
                         bases[i] = 0;
                     else
-                        modifier = virtualBomb.Where(x => "Obvious".Equals(x.Author)).Count();
+                        modifier = virtualBomb.Where(mod => mod?.Author == "Obvious").Count();
                     break;
                 case 31: // Piissii
                     modifier = bomb.GetSerialNumber().Distinct().Count() != 6 ? 4 : -1;
@@ -190,13 +192,14 @@ public static class ScoringSystem
                         modifier = -2;
                     break;
                 case 33: // redpenguin
-                    modifier = virtualBomb.All(x => !"FullBoss".Equals(x.BossStatus)) ? 4 : -1;
+                    modifier = virtualBomb.All(mod => mod?.BossStatus != "FullBoss") ? 4 : -1;
                     break;
                 case 34: // Rosenothorns03
-                    modifier = virtualBomb.Any(x => x.Name.StartsWith("The")) ? 3 : -1;
+                    modifier = virtualBomb.Any(mod => mod != null && mod.Name.StartsWith("The ")) ? 3 : -1;
                     break;
                 case 35: // Scoping Landscape
-                    if (virtualBomb.Any(x => x.Name.ToLower().Contains("cipher") || x.Name.ToLower().Contains("cycle") || x.Name.ToLower().Contains("unfair")) || realBomb.Any(x => x.Name.ToLower().Contains("cipher") || x.Name.ToLower().Contains("cycle") || x.Name.ToLower().Contains("unfair")))
+                    if (virtualBomb.Any(mod => mod != null && (mod.Name.ContainsIgnoreCase("cipher") || mod.Name.ContainsIgnoreCase("cycle") || mod.Name.ContainsIgnoreCase("unfair")))
+                            || realBomb.Any(mod => mod.Name.ContainsIgnoreCase("cipher") || mod.Name.ContainsIgnoreCase("cycle") || mod.Name.ContainsIgnoreCase("unfair")))
                         modifier = 5;
                     break;
                 case 36: // Setra
@@ -204,41 +207,42 @@ public static class ScoringSystem
                     break;
                 case 37: // Sierra
                     var sierraColors = new[] { "green", "blue", "brown", "purple", "orange", "black", "white" };
-                    if (virtualBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))) || realBomb.Any(x => sierraColors.Any(color => x.Name.ToLower().Contains(color))))
+                    if (virtualBomb.Any(mod => mod != null && sierraColors.Any(color => mod.Name.ContainsIgnoreCase(color))) || realBomb.Any(x => sierraColors.Any(color => x.Name.ContainsIgnoreCase(color))))
                         modifier = 5;
                     else if (bomb.GetSerialNumberLetters().Any(x => x == 'S'))
                         modifier = -1;
                     break;
                 case 38: // tandyCake
-                    if (virtualBomb.Any(x => "The Pink Button".Equals(x.Name)) || realBomb.Any(x => "The Pink Button".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "The Pink Button") || realBomb.Any(mod => mod.Name == "The Pink Button"))
                         modifier = -bomb.GetBatteryCount(Battery.D);
                     else
                         modifier = bomb.GetSerialNumberNumbers().First() % 2 == 0 ? 3 : -1;
                     break;
                 case 39: // TheFullestCircle
-                    modifier = virtualBomb.Any(x => "Watch the Clock".Equals(x.Name)) || realBomb.Any(x => "Watch the Clock".Equals(x.Name)) ? 5 :
-                        bomb.GetBatteryCount() == 0 ? 4 : -1;
+                    modifier = virtualBomb.Any(mod => mod?.Name == "Watch the Clock") || realBomb.Any(mod => mod.Name == "Watch the Clock")
+                        ? 5 : bomb.GetBatteryCount() == 0 ? 4 : -1;
                     break;
                 case 40: // Timwi
-                    modifier = bomb.GetSerialNumberNumbers().Any(x => x == 4 && x == 7) ? 5 : bomb.GetSerialNumberNumbers().Any(x => x == 4 || x == 7) ? 3 : -1;
+                    var nums = bomb.GetSerialNumberNumbers();
+                    modifier = nums.Contains(4) && nums.Contains(7) ? 5 : nums.Any(num => num == 4 || num == 7) ? 3 : -1;
                     break;
                 case 41: // Varunaxx
                     if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
                         modifier = 4;
                     else
-                        modifier = (int)DateTime.Now.DayOfWeek - 3;
+                        modifier = (int) DateTime.Now.DayOfWeek - 3;
                     break;
                 case 42: // WitekWitek
-                    modifier = bomb.GetSerialNumberLetters().Any(x => "WI".Contains(x)) || realBomb.Any(x => "Simon Sends".Equals(x)) ? 3 : -2;
+                    modifier = bomb.GetSerialNumberLetters().Any(x => "WI".Contains(x)) || realBomb.Any(mod => mod.Name == "Simon Sends") ? 3 : -2;
                     break;
                 case 43: // xorote
-                    modifier = virtualBomb.Any(x => x.Author.Equals("Speakingevil")) || realBomb.Any(x => x.Author.Equals("Speakingevil")) ? 4 : -1;
+                    modifier = virtualBomb.Any(mod => mod?.Author == "Speakingevil") || realBomb.Any(mod => mod.Author == "Speakingevil") ? 4 : -1;
                     break;
                 case 44: // Zaakeil
-                    modifier = 5 - (bomb.GetBatteryCount() + bomb.GetPortCount());
+                    modifier = 5 - bomb.GetBatteryCount() - bomb.GetPortCount();
                     break;
                 case 45: // Zaphod
-                    if (virtualBomb.Any(x => "42".Equals(x.Name)) || realBomb.Any(x => "42".Equals(x.Name)))
+                    if (virtualBomb.Any(mod => mod?.Name == "42") || realBomb.Any(mod => mod.Name == "42"))
                         bases[i] = 0;
                     else
                         modifier = bomb.IsPortPresent(Port.StereoRCA) ? 3 : -1;

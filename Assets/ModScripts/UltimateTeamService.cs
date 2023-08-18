@@ -5,8 +5,8 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using static UnityEngine.Debug;
 
-public class UltimateTeamService : MonoBehaviour {
-
+public class UltimateTeamService : MonoBehaviour
+{
     public bool loaded = false;
     public bool connectedJson, connectedSprite = false;
     public Texture offlineSprite;
@@ -23,6 +23,8 @@ public class UltimateTeamService : MonoBehaviour {
 
     IEnumerator getRawJson()
     {
+        Log("[Ultimate Team Service] Downloading JSON...");
+
         string raw;
         var request = UnityWebRequest.Get("https://ktane.timwi.de/json/raw");
 
@@ -30,40 +32,40 @@ public class UltimateTeamService : MonoBehaviour {
 
         if (request.error != null)
         {
-            Log("Connection error! Using offline raw JSON from 8/12/23.");
+            Log("[Ultimate Team Service] JSON download failed. Using raw JSON from 8/12/23.");
             raw = offlineJson.text;
         }
         else
         {
             connectedJson = true;
-            Log("JSON has now been obtained.");
+            Log("[Ultimate Team Service] JSON download succeeded.");
             raw = request.downloadHandler.text;
         }
 
         allMods = JsonConvert.DeserializeObject<Root>(raw).KtaneModules;
 
         while (spriteSheet == null)
-        {
             yield return null;
-        }
         loaded = true;
     }
 
     IEnumerator getSpriteSheet()
     {
+        Log("[Ultimate Team Service] Downloading Sprite Sheet...");
+
         var request = UnityWebRequestTexture.GetTexture("https://ktane.timwi.de/iconsprite");
         yield return request.SendWebRequest();
 
         if (request.error != null)
         {
-            Log("Connection error! Using default spritesheet from 8/12/23.");
+            Log("[Ultimate Team Service] Sprite sheet download failed. Using spritesheet from 8/12/23.");
             spriteSheet = offlineSprite;
         }
         else
         {
-            Log("The spritesheet has now been obtained.");
+            Log("[Ultimate Team Service] Sprite sheet download succeeded.");
             connectedSprite = true;
-            spriteSheet = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            spriteSheet = ((DownloadHandlerTexture) request.downloadHandler).texture;
         }
     }
 }
