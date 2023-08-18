@@ -123,7 +123,7 @@ public static class ScoringSystem
                     modifier = virtualBomb.Count(mod => mod?.ExpertDifficulty == "VeryEasy") - virtualBomb.Count(mod => mod?.ExpertDifficulty == "VeryHard") / 2;
                     break;
                 case 16: // Gwen
-                    modifier = bomb.GetSerialNumberNumbers().Count() % 2 != 0 ? 4 : -1;
+                    modifier = bomb.GetSerialNumberNumbers().Count(x => x % 2 != 0) == bomb.GetSerialNumberNumbers().Count() ? 4 : -1;
                     break;
                 case 17: // JyGein
                     modifier = (bomb.GetSerialNumberNumbers().Sum() / 5) - 2;
