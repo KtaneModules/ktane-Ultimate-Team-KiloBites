@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using KModkit;
 using UnityEngine;
 using UnityEngine.UI;
-using KModkit;
-using static UnityEngine.Random;
+
 using static UnityEngine.Debug;
+using static UnityEngine.Random;
 
 public class UltimateTeamScript : MonoBehaviour
 {
@@ -42,21 +43,18 @@ public class UltimateTeamScript : MonoBehaviour
     private List<KtaneModule> allMods;
     private List<KtaneModule> virtualBomb = new List<KtaneModule>();
     private List<KtaneModule> realBomb = new List<KtaneModule>();
-    private string[] moduleNames = new string[12];
-    private List<string> expertDifficulties = new List<string>();
-    private List<List<int>> expertProf = new List<List<int>>();
+    private List<int[]> expertProficiencies = new List<int[]>();
     private List<List<int>> moduleProf = new List<List<int>>();
     private Texture spriteSheet;
     private Sprite[] icons = new Sprite[12];
-    private List<int> experts = new List<int>();
-    private List<int> team = new List<int>();
+    private int[] experts;
+    private int[] expertIxsByScoreDesc;
     private string[] currExpertPrefDiffs = new string[6];
     private string[] currExpertNames = new string[6];
-    private int[] mods = new int[12];
     private bool[] bossIx = new bool[12];
     private bool[] needyIx = new bool[12];
     private bool[] selected = new bool[6];
-    private bool boss, bombFlipped, cannotPress, needy, rightMenu;
+    private bool bombFlipped, cannotPress, rightMenu;
     private static string connected;
 
     private Image[][] renders;
@@ -93,12 +91,9 @@ public class UltimateTeamScript : MonoBehaviour
             {
                 bool correct = true;
                 for (int i = 0; i < 6; i++)
-                {
-                    if (selected[i] != team.Contains(i))
-                    {
+                    if (selected[i] != expertIxsByScoreDesc.Contains(i))
                         correct = false;
-                    }
-                }
+
                 if (correct)
                 {
                     StopAllCoroutines();
@@ -107,17 +102,10 @@ public class UltimateTeamScript : MonoBehaviour
                 }
                 else
                 {
-                    var strikeExperts = new List<string>();
-
-                    for (int i = 0; i < 6; i++)
-                    {
-                        if (selected[i])
-                        {
-                            strikeExperts.Add(currExpertNames[i]);
-                        }
-                    }
-
-                    var strikeMessage = strikeExperts.Count > 0 ? $"{strikeExperts.PickRandom()} has been selected and decided to strike on {moduleNames.Where(x => !"[TIMER]".Equals(x)).PickRandom()}, striking out the bomb entirely." : "You have selected nobody for this bomb, therefore blowing up the bomb as a result.";
+                    var selectedExperts = Enumerable.Range(0, 6).Where((name, ix) => selected[ix]).ToArray().Shuffle();
+                    var strikeMessage = selectedExperts.Length > 0
+                        ? $"{selectedExperts[0]} has been selected and decided to strike on {virtualBomb[expertProficiencies[selectedExperts[0]].PickRandom()].Name}, striking out the bomb entirely."
+                        : "You haven’t selected anybody for this bomb, therefore blowing up the bomb as a result.";
 
                     Log($"[Ultimate Team #{moduleId}] {strikeMessage} Strike!");
 
@@ -136,13 +124,6 @@ public class UltimateTeamScript : MonoBehaviour
     void Start()
     {
         cannotPress = true;
-        needy = Range(0, 2) == 0;
-        boss = Range(0, 4) > 1;
-        var a = Range(0, 12);
-        var b = Enumerable.Range(0, 12).Where(x => x != a).PickRandom();
-
-        needyIx[a] = needy;
-        bossIx[b] = boss;
 
         bombCasing.transform.parent.localScale = Vector3.zero;
 
@@ -162,7 +143,7 @@ public class UltimateTeamScript : MonoBehaviour
         var utService = FindObjectOfType<UltimateTeamService>();
 
         if (utService == null)
-            throw new Exception("It cannot find the service!");
+            throw new Exception("Ultimate Team cannot find the Ultimate Team Service prefab!");
 
         yield return new WaitUntil(() => utService.loaded);
 
@@ -170,7 +151,9 @@ public class UltimateTeamScript : MonoBehaviour
             StartCoroutine(LEDFlash());
         cannotPress = false;
 
-        connected = utService.connectedJson && utService.connectedSprite ? "This module is connected to the internet, grabbing the latest modules possible from the repo." : "This module is not connected to the internet and therefore will use its backup from 8/12/23.";
+        connected = utService.connectedJson && utService.connectedSprite
+            ? "This module is connected to the internet, grabbing the latest modules possible from the repo."
+            : "This module is not connected to the internet and therefore will use its backup from 8/12/23.";
 
         Log($"[Ultimate Team #{moduleId}] {connected}");
 
@@ -210,49 +193,80 @@ public class UltimateTeamScript : MonoBehaviour
 
     void generateModule()
     {
+        tryagain:
+
+        // Step 1: pick 11 modules that will be on the virtual bomb
+        virtualBomb.Clear();
+        if (Range(0, 4) != 0)
+            virtualBomb.Add(allMods.Where(m => m.BossStatus == "FullBoss" || m.BossStatus == "SemiBoss").PickRandom());
+        if (Range(0, 2) != 0)
+            virtualBomb.Add(allMods.Where(m => m.Type == "Needy").PickRandom());
+        var eligibleRemainingModules = allMods.Where(m => m.Type == "Regular" && m.BossStatus != "FullBoss" && m.BossStatus != "SemiBoss").ToList();
+        while (virtualBomb.Count < 11)
+        {
+            var ix = Range(0, eligibleRemainingModules.Count);
+            virtualBomb.Add(eligibleRemainingModules[ix]);
+            eligibleRemainingModules.RemoveAt(ix);
+        }
+        virtualBomb.Add(null);
+        virtualBomb.Shuffle();
+
+        // Step 2: generate all possible sets of expert proficiencies (1–3 modules per expert)
+        var eligibilitySets = Enumerable.Range(0, 3).Select(_ => new List<int[]>()).ToArray();
+        for (var val = 0; val < (1 << 11); val++)
+        {
+            var list = new List<int>();
+            for (var b = 0; b < 11; b++)
+                if ((val & (1 << b)) != 0)
+                    list.Add(b);
+            if (list.Count >= 1 && list.Count <= 3 && list.All(mIx => virtualBomb[mIx] != null && virtualBomb[mIx].ExpertDifficulty != "Trivial" && virtualBomb[mIx].ExpertDifficulty != "VeryEasy"))
+                eligibilitySets[list.Count - 1].Add(list.ToArray());
+        }
+
+        // Step 3: decide on the expert proficiencies
+        expertProficiencies.Clear();
+        for (var expIx = 0; expIx < 6; expIx++)
+        {
+            var proficiencySize = new[] { 1, 2, 2, 2, 3 }.PickRandom();
+            if (eligibilitySets[proficiencySize - 1].Count == 0)
+                goto tryagain;
+            var elIx = Range(0, eligibilitySets[proficiencySize - 1].Count);
+            expertProficiencies.Add(eligibilitySets[proficiencySize - 1][elIx]);
+            eligibilitySets[proficiencySize - 1].RemoveAt(elIx);
+        }
+
+        // Step 4: determine the experts proficient in each module, and make sure that each module has at most 2 experts
+        moduleProf.Clear();
+        for (int modIx = 0; modIx < 12; modIx++)
+        {
+            var listofExperts = new List<int>();
+            for (int expIx = 0; expIx < 6; expIx++)
+                if (expertProficiencies[expIx].Contains(modIx))
+                    listofExperts.Add(expIx);
+            if (listofExperts.Count > 2)
+                goto tryagain;
+            moduleProf.Add(listofExperts);
+        }
+
+        // Generate sprites
         var maxY = allMods.Max(mod => mod.Y);
 
-        mods[Range(0, 12)] = -1;
-
-        for (int i = 0; i < 12; i++)
+        for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
         {
-            if (mods[i] == -1)
-            {
-                icons[i] = timer;
-                moduleNames[i] = "[TIMER]";
-                expertDifficulties.Add("[TIMER]");
-            }
-            else
-            {
-                var types = new[] { "Needy", "Widget" };
-
-                var bossTypes = new[] { "FullBoss", "SemiBoss" };
-
-                if (bossIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => bossTypes[0].Equals(allMods[x].BossStatus) || bossTypes[1].Equals(allMods[x].BossStatus) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
-                else if (needyIx[i])
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => types[0].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
-                else
-                    mods[i] = Enumerable.Range(0, allMods.Count).Where(x => mods.Any(mod => mod != x) && !bossTypes[0].Equals(allMods[x].BossStatus) && !bossTypes[1].Equals(allMods[x].BossStatus) && !types[0].Equals(allMods[x].Type) && !types[1].Equals(allMods[x].Type) && allMods[x].X != 0 && allMods[x].Y != 0).PickRandom();
-
-                KtaneModule usedMod = allMods[mods[i]];
-                virtualBomb.Add(usedMod);
-                icons[i] = Sprite.Create(spriteSheet as Texture2D, new Rect(32 * usedMod.X, 32 * (maxY - usedMod.Y), 32, 32), new Vector2(0.5f, 0.5f));
-                icons[i].texture.filterMode = FilterMode.Point;
-                moduleNames[i] = usedMod.Name;
-                expertDifficulties.Add(usedMod.ExpertDifficulty);
-            }
+            needyIx[modIx] = virtualBomb[modIx] != null && virtualBomb[modIx].Type == "Needy";
+            bossIx[modIx] = virtualBomb[modIx] != null && (virtualBomb[modIx].BossStatus == "FullBoss" || virtualBomb[modIx].BossStatus == "SemiBoss");
+            icons[modIx] = virtualBomb[modIx] == null ? timer : createSprite(virtualBomb[modIx], maxY);
         }
-        List<string> ids = allMods.Select(x => x.ModuleID).ToList();
+
         foreach (string modID in Bomb.GetModuleIDs())
-            if (ids.Contains(modID))
-                realBomb.Add(allMods[ids.IndexOf(modID)]);
+            realBomb.AddRange(allMods.Where(m => m.ModuleID == modID));
 
-        Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows: {moduleNames.Join(", ")}");
+        Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows:");
+        for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
+            Log($@"[Ultimate Team #{moduleId}] {(virtualBomb[modIx] == null ? "[TIMER]" :
+                $"{virtualBomb[modIx].Name} — {virtualBomb[modIx].ExpertDifficulty} — {(moduleProf[modIx].Count == 0 ? "(none)" : moduleProf[modIx].Select(expIx => expertNames[expIx]).Join(", "))}")}");
 
-        experts = Enumerable.Range(0, profilePictures.Length).ToList();
-        experts.Shuffle();
-        experts = experts.Take(6).ToList();
+        experts = Enumerable.Range(0, profilePictures.Length).ToArray().Shuffle();
 
         for (int i = 0; i < 6; i++)
         {
@@ -262,66 +276,13 @@ public class UltimateTeamScript : MonoBehaviour
 
         Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
         Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard")}");
+        Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows: {moduleProf.Select((expIxs, modIx) => virtualBomb[modIx] == null ? "[TIMER]" : virtualBomb[modIx].Name + " — " + (expIxs.Count == 0 ? "none" : expIxs.Select(y => currExpertNames[y]).Join(", "))).Join("; ")}.");
 
-        assignProficiencies();
         displaySprites();
         calculations();
     }
 
-    void assignProficiencies()
-    {
-        tryagain:
-        var q = new List<List<int>>();
-        var q2 = new List<int>();
-
-        for (int i = 0; i < 6; i++)
-        {
-            var prof = genProficiency(q);
-            q.Add(prof);
-            q2.AddRange(prof);
-        }
-        var counts = new int[12];
-
-        foreach (var item in q2)
-            counts[item]++;
-
-        if (counts.Where(x => x > 2).Count() > 0)
-            goto tryagain;
-        else
-        {
-            expertProf = q.ToList();
-            for (int i = 0; i < 12; i++)
-            {
-                moduleProf.Add(new List<int>());
-                for (int j = 0; j < 6; j++)
-                    if (expertProf[j].Contains(i))
-                        moduleProf.Last().Add(j);
-            }
-        }
-        Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows, starting from {(moduleNames[0] == "[TIMER]" ? "the timer" : moduleNames[0])}: {moduleProf.Select((x, ix) => moduleNames[ix] + " — " + (x.Count() == 0 ? "none" : x.Select(y => currExpertNames[y]).Join(" | "))).Join(", ")}.");
-    }
-
-    List<int> genProficiency(List<List<int>> q)
-    {
-        tryagain:
-        var prob = Range(0, 5);
-        List<int> ixs = Enumerable.Range(0, 12).Where(x => mods[x] != -1).ToList().Shuffle().Take(prob == 0 ? 1 : prob == 4 ? 3 : 2).ToList();
-
-        for (int i = 0; i < q.Count; i++)
-            if (ixs.Count == q[i].Count)
-            {
-                var fail = true;
-                for (int j = 0; j < q[i].Count; j++)
-                    if (ixs[j] != q[i][j])
-                        fail = false;
-                if (fail)
-                    goto tryagain;
-            }
-
-        return ixs;
-    }
-
-    void displaySprites()
+    private void displaySprites()
     {
         for (int i = 0; i < 6; i++)
         {
@@ -332,18 +293,28 @@ public class UltimateTeamScript : MonoBehaviour
             for (int j = 0; j < 2; j++)
             {
                 renders[i][j].sprite = placeholder;
-                renders[i][j].enabled = mods[bombFlipped ? i + 6 : i] != -1 && expertDifficulties[bombFlipped ? i + 6 : i] != "VeryEasy" && expertDifficulties[bombFlipped ? i + 6 : i] != "Trivial" && expertDifficulties[bombFlipped ? i + 6 : i] != "[TIMER]";
+                renders[i][j].enabled = virtualBomb[bombFlipped ? i + 6 : i] != null;
             }
 
             for (int j = 0; j < moduleProf[bombFlipped ? i + 6 : i].Count; j++)
-            {
                 renders[i][j].sprite = profilePictures[experts[moduleProf[bombFlipped ? i + 6 : i][j]]];
-            }
         }
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < 2; j++)
                 if (renders[i][j].sprite.name == "!placeholder")
                     renders[i][j].enabled = false;
+    }
+
+    private Sprite createSprite(KtaneModule module, int maxY)
+    {
+        var sprite = Sprite.Create(spriteSheet as Texture2D, new Rect(32 * module.X, 32 * (maxY - module.Y), 32, 32), new Vector2(0.5f, 0.5f));
+        sprite.texture.filterMode = FilterMode.Point;
+        return sprite;
+    }
+
+    private bool isAllowed(int modIx)
+    {
+        return modIx != -1 && allMods[modIx].ExpertDifficulty != "Trivial" && allMods[modIx].ExpertDifficulty != "VeryEasy";
     }
 
     void calculations()
@@ -353,32 +324,40 @@ public class UltimateTeamScript : MonoBehaviour
 
         var ixes = new[] { "Easy", "Medium", "Hard", "VeryHard" };
 
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < expertProf[i].Count(); j++)
-                scores[i] += "Extreme".Equals(expertDifficulties[expertProf[i][j]]) ? 4 : Array.IndexOf(ixes, expertDifficulties[expertProf[i][j]]) + 1;
+        for (var expIx = 0; expIx < 6; expIx++)
+            foreach (var modIx in expertProficiencies[expIx])
+                scores[expIx] += virtualBomb[modIx].ExpertDifficulty == "Extreme" ? 4 : Array.IndexOf(ixes, virtualBomb[modIx].ExpertDifficulty) + 1;
+
         Log($"[Ultimate Team #{moduleId}] After adding proficiency scores for each expert in reading order: {scores.Join(", ")}");
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < expertDifficulties.Count(); j++)
-                if (expertDifficulties[j] == currExpertPrefDiffs[i] || "Extreme".Equals(expertDifficulties[j]) && "Extreme".Contains(currExpertPrefDiffs[i]))
-                    scores[i]++;
+        for (var expIx = 0; expIx < 6; expIx++)
+            for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
+                if (virtualBomb[modIx] != null && (
+                    currExpertPrefDiffs[expIx] == virtualBomb[modIx].ExpertDifficulty ||
+                    (currExpertPrefDiffs[expIx] == "VeryHard/Extreme" && (virtualBomb[modIx].ExpertDifficulty == "VeryHard" || virtualBomb[modIx].ExpertDifficulty == "Extreme"))))
+                    scores[expIx]++;
+
         Log($"[Ultimate Team #{moduleId}] After adding preferred difficulty scores: {scores.Join(", ")}");
         scores = ScoringSystem.modifyingScores(Bomb, virtualBomb, realBomb, scores, experts.ToArray());
         Log($"[Ultimate Team #{moduleId}] Final scores: {scores.Join(", ")}");
-        team = Enumerable.Range(0, 6).ToList();
-        team = team.Select((x, ix) => new { x, ix }).OrderByDescending(x => scores[x.ix]).Select(x => x.x).ToList();
-        if (expertDifficulties.Count(x => "VeryEasy".Equals(x) || "Trivial".Equals(x)) >= 4 || team.Any(x => x == 66669420))
+
+        expertIxsByScoreDesc = Enumerable.Range(0, 6).OrderByDescending(ix => scores[ix]).ToArray();
+        var numEasy = virtualBomb.Count(m => m != null && (m.ExpertDifficulty == "Trivial" || m.ExpertDifficulty == "VeryEasy"));
+        var hasUnicornScore = scores.Any(score => score == 66669420);
+        if (numEasy >= 4 || hasUnicornScore)
         {
-            var log = team.Any(x => x == 66669420) ? "CyanixDash is your only expert since the firstmost condition applied. Don't take anyone else." : "Since there are at least 4 Very Easy/Trivial modules on the virtual bomb, you'll be taking only one expert.";
-            team = team.Take(1).ToList();
-            Log($"[Ultimate Team #{moduleId}] {log}");
+            expertIxsByScoreDesc = expertIxsByScoreDesc.Take(1).ToArray();
+            Log($@"[Ultimate Team #{moduleId}] {(hasUnicornScore
+                ? "CyanixDash is your only expert since the firstmost condition applied. Don’t take anyone else."
+                : "Since there are at least 4 Very Easy/Trivial modules on the virtual bomb, you’ll be taking only one expert.")}");
         }
         else
         {
-            team = team.Take(2).ToList();
-            Log($"[Ultimate Team #{moduleId}] Since there are less than 4 Very Easy/Trivial modules on the virtual bomb, you'll be taking two experts.");
+            expertIxsByScoreDesc = expertIxsByScoreDesc.Take(2).ToArray();
+            Log($"[Ultimate Team #{moduleId}] Since there are less than 4 Very Easy/Trivial modules on the virtual bomb, you’ll be taking two experts.");
         }
-        var resultFormat = team.Count == 1 ? $"According to the highest score, you should take {currExpertNames[team[0]]}." : $"According to the two highest scores, you should take {currExpertNames[team[0]]} and {currExpertNames[team[1]]}.";
-        Log($"[Ultimate Team #{moduleId}] {resultFormat}");
+        Log($@"[Ultimate Team #{moduleId}] {(expertIxsByScoreDesc.Length == 1
+            ? $"According to the highest score, you should take {currExpertNames[expertIxsByScoreDesc[0]]}."
+            : $"According to the two highest scores, you should take {currExpertNames[expertIxsByScoreDesc[0]]} and {currExpertNames[expertIxsByScoreDesc[1]]}.")}");
     }
 
     private IEnumerator solve()
@@ -583,7 +562,7 @@ public class UltimateTeamScript : MonoBehaviour
         while (cannotPress)
             yield return true;
         for (int i = 0; i < 6; i++)
-            if (selected[i] != team.Contains(i))
+            if (selected[i] != expertIxsByScoreDesc.Contains(i))
                 expertCards[i].OnInteract();
         yield return true;
         statusLightButton.OnInteract();
