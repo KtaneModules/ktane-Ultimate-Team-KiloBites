@@ -71,17 +71,21 @@ public static class ScoringSystem
                     }
                     break;
                 case 7: // Danielstigman
-                    var dan = new[] { "VeryEasy", "Easy", "Medium", "Hard", "VeryHard" }
+                    var dan = new[] { "Trivial", "VeryEasy", "Easy", "Medium", "Hard", "VeryHard", "Extreme" }
                         .Select(difficulty => virtualBomb.Count(mod => mod?.ExpertDifficulty == difficulty))
                         .ToArray();
                     int mostCommon = 0;
-                    for (int j = 1; j < 5; j++)
+                    for (int j = 1; j < 6; j++)
                         if (dan[j] >= dan[mostCommon])
                             mostCommon = j;
-                    mostCommon++;
-                    if (bomb.GetBatteryCount() >= 5)
-                        mostCommon *= -1;
-                    modifier = mostCommon;
+                    if (mostCommon == 0 || dan.Last() > mostCommon)
+                        bases[i] = 0;
+                    else
+                    {
+                        if (bomb.GetBatteryCount() >= 5)
+                            mostCommon *= -1;
+                        modifier = mostCommon;
+                    }
                     break;
                 case 8: // dicey
                     modifier = Array.IndexOf(experts, experts[i]) == 5 ? -5 : Array.IndexOf(experts, experts[i]) + 1;
