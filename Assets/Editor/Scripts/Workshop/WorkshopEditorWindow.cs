@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#pragma warning disable 436
+
+using UnityEditor;
 using Steamworks;
 using UnityEngine;
 using System.IO;
@@ -19,6 +21,7 @@ public class WorkshopEditorWindow : EditorWindow
     protected WorkshopItem currentWorkshopItem;
     protected WorkshopItemEditor workshopItemEditor;
     protected string changeNotes;
+    protected bool updatePreview = true;
 
     protected CallResult<CreateItemResult_t> onCreateItemCallResultHandler;
     protected CallResult<SubmitItemUpdateResult_t> onItemUpdateCallResultHandler;
@@ -137,6 +140,8 @@ public class WorkshopEditorWindow : EditorWindow
             //Change Notes
             EditorGUILayout.PrefixLabel("Change Notes:");
             changeNotes = EditorGUILayout.TextArea(changeNotes, GUILayout.MinHeight(64));
+            
+            updatePreview = EditorGUILayout.ToggleLeft("Update Workshop preview image (only as the owner of the item!)", updatePreview);
 
             if (string.IsNullOrEmpty(changeNotes))
             {
@@ -217,7 +222,7 @@ public class WorkshopEditorWindow : EditorWindow
             SteamUGC.SetItemTags(ugcUpdateHandle, GetTags());
         }
 
-        if (ModConfig.PreviewImage != null)
+        if (updatePreview && ModConfig.PreviewImage != null)
         {
             string previewImagePath = AssetDatabase.GetAssetPath(ModConfig.PreviewImage);
             previewImagePath = Path.GetFullPath(previewImagePath);
