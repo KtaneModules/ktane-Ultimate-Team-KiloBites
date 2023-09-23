@@ -198,10 +198,10 @@ public class UltimateTeamScript : MonoBehaviour
         // Step 1: pick 11 modules that will be on the virtual bomb
         virtualBomb.Clear();
         if (Range(0, 4) != 0)
-            virtualBomb.Add(allMods.Where(m => m.BossStatus == "FullBoss" || m.BossStatus == "SemiBoss").PickRandom());
+            virtualBomb.Add(allMods.Where(m => m.BossStatus == "FullBoss" || m.BossStatus == "SemiBoss" && m.X != 0 && m.Y != 0).PickRandom());
         if (Range(0, 2) != 0)
-            virtualBomb.Add(allMods.Where(m => m.Type == "Needy").PickRandom());
-        var eligibleRemainingModules = allMods.Where(m => m.Type == "Regular" && m.BossStatus != "FullBoss" && m.BossStatus != "SemiBoss").ToList();
+            virtualBomb.Add(allMods.Where(m => m.Type == "Needy" && m.X != 0 && m.Y != 0).PickRandom());
+        var eligibleRemainingModules = allMods.Where(m => m.Type == "Regular" && m.BossStatus != "FullBoss" && m.BossStatus != "SemiBoss" && m.X != 0 && m.Y != 0).ToList();
         while (virtualBomb.Count < 11)
         {
             var ix = Range(0, eligibleRemainingModules.Count);
