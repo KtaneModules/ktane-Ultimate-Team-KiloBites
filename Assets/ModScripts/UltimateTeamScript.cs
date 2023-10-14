@@ -153,7 +153,7 @@ public class UltimateTeamScript : MonoBehaviour
 
         connected = utService.connectedJson && utService.connectedSprite
             ? "This module is connected to the internet, grabbing the latest modules possible from the repo."
-            : "This module is not connected to the internet and therefore will use its backup from 8/12/23.";
+            : "This module is not connected to the internet and therefore will use its backup from 10/14/23.";
 
         Log($"[Ultimate Team #{moduleId}] {connected}");
 
@@ -264,7 +264,7 @@ public class UltimateTeamScript : MonoBehaviour
         Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows:");
         for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
             Log($@"[Ultimate Team #{moduleId}] {(virtualBomb[modIx] == null ? "[TIMER]" :
-                $"{virtualBomb[modIx].Name} — {virtualBomb[modIx].ExpertDifficulty} — {(moduleProf[modIx].Count == 0 ? "(none)" : moduleProf[modIx].Select(expIx => expertNames[expIx]).Join(", "))}")}");
+                $"{virtualBomb[modIx].Name} — {virtualBomb[modIx].ExpertDifficulty} — {(moduleProf[modIx].Count == 0 ? "(none)" : moduleProf[modIx].Select(expIx => currExpertNames[expIx]).Join(", "))}")}");
 
         experts = Enumerable.Range(0, profilePictures.Length).ToArray().Shuffle();
 
@@ -275,7 +275,7 @@ public class UltimateTeamScript : MonoBehaviour
         }
 
         Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
-        Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard")}");
+        Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard / Extreme")}");
         Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows: {moduleProf.Select((expIxs, modIx) => virtualBomb[modIx] == null ? "[TIMER]" : virtualBomb[modIx].Name + " — " + (expIxs.Count == 0 ? "none" : expIxs.Select(y => currExpertNames[y]).Join(", "))).Join("; ")}.");
 
         displaySprites();

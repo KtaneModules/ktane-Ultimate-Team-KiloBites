@@ -58,7 +58,7 @@ public class UltimateTeamService : MonoBehaviour
 
         if (request.error != null)
         {
-            Log("[Ultimate Team Service] Sprite sheet download failed. Using spritesheet from 8/12/23.");
+            Log("[Ultimate Team Service] Sprite sheet download failed. Using spritesheet from 10/14/23.");
             spriteSheet = offlineSprite;
         }
         else
