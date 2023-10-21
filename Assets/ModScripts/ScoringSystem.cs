@@ -12,12 +12,15 @@ public static class ScoringSystem
 
     private static int digitalRoot(int[] digits)
     {
+        if (digits.All(x => x == 0))
+            return 0;
+
         switch (digits.Length)
         {
             case 2:
                 return (((digits[0] * 10 + digits[1]) - 1) % 9) + 1;
             case 3:
-                return (((digits[0] * 100 + digits[1] * 10 + digits[1]) - 1) % 9) + 1;
+                return (((digits[0] * 100 + digits[1] * 10 + digits[2]) - 1) % 9) + 1;
             case 4:
                 return (((digits[0] * 1000 + digits[1] * 100 + digits[2] * 10 + digits[3]) - 1) % 9) + 1;
         }
