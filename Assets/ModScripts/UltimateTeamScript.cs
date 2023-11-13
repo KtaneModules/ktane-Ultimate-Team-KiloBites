@@ -261,10 +261,8 @@ public class UltimateTeamScript : MonoBehaviour
         foreach (string modID in Bomb.GetModuleIDs())
             realBomb.AddRange(allMods.Where(m => m.ModuleID == modID));
 
-        Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows:");
-        for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
-            Log($@"[Ultimate Team #{moduleId}] {(virtualBomb[modIx] == null ? "[TIMER]" :
-                $"{virtualBomb[modIx].Name} — {virtualBomb[modIx].ExpertDifficulty} — {(moduleProf[modIx].Count == 0 ? "(none)" : moduleProf[modIx].Select(expIx => currExpertNames[expIx]).Join(", "))}")}");
+        
+            
 
         experts = Enumerable.Range(0, profilePictures.Length).ToArray().Shuffle();
 
@@ -273,6 +271,11 @@ public class UltimateTeamScript : MonoBehaviour
             currExpertNames[i] = expertNames[experts[i]];
             currExpertPrefDiffs[i] = expertPreferredDiffs[experts[i]];
         }
+
+        Log($"[Ultimate Team #{moduleId}] The virtual bomb is displayed as follows:");
+        for (var modIx = 0; modIx < virtualBomb.Count; modIx++)
+            Log($@"[Ultimate Team #{moduleId}] {(virtualBomb[modIx] == null ? "[TIMER]" :
+                $"{virtualBomb[modIx].Name} — {virtualBomb[modIx].ExpertDifficulty} — {(moduleProf[modIx].Count == 0 ? "(none)" : moduleProf[modIx].Select(expIx => currExpertNames[expIx]).Join(", "))}")}");
 
         Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
         Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard / Extreme")}");
