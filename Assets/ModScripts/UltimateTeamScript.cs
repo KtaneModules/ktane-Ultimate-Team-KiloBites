@@ -279,7 +279,7 @@ public class UltimateTeamScript : MonoBehaviour
 
         Log($"[Ultimate Team #{moduleId}] The candidates of experts are: {currExpertNames.Join(", ")}");
         Log($"[Ultimate Team #{moduleId}] These experts have these preferred difficulties: {currExpertPrefDiffs.Join(", ").Replace("VeryEasy", "Very Easy").Replace("VeryHard/Extreme", "Very Hard / Extreme")}");
-        Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows: {moduleProf.Select((expIxs, modIx) => virtualBomb[modIx] == null ? "[TIMER]" : virtualBomb[modIx].Name + " — " + (expIxs.Count == 0 ? "none" : expIxs.Select(y => currExpertNames[y]).Join(", "))).Join("; ")}.");
+        Log($"[Ultimate Team #{moduleId}] The proficiencies are as follows: {moduleProf.Select((expIxs, modIx) => virtualBomb[modIx] == null ? "[TIMER]" + " — " + "none" : virtualBomb[modIx].Name + " — " + (expIxs.Count == 0 ? "none" : expIxs.Select(y => currExpertNames[y]).Join(", "))).Join("; ")}.");
 
         displaySprites();
         calculations();
